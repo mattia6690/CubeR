@@ -17,7 +17,7 @@ password<-  "Your Gitlab Passwort" # Manual insertion
 password<-  getPass::getPass() # Password Popup
 
 
-devtools::install_git("https://gitlab.inf.unibz.it/SOS/MonalisR", 
+devtools::install_git("https://gitlab.inf.unibz.it/REMSEN/CubeR", 
   credentials = git2r::cred_user_pass(uname, password)
 )
 
