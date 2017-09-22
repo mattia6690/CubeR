@@ -4,7 +4,7 @@
 
 #### Download the Package from Gitlab
 
-For now this Package is in a develpment stage and therefore privatly hosted in a Gitlab repository. It is available only to registered group members and the access has to be granted by one of the active members of the group (see [Members Section](https://gitlab.inf.unibz.it/SOS/MonalisR/project_members) or below)
+For now this Package is in a develpment stage and therefore privatly hosted in a Gitlab repository. It is available only to registered group members and the access has to be granted by one of the active members of the group (see [Members Section](https://gitlab.inf.unibz.it/REMSEN/CubeR/project_members) or below)
 A general way to load the package in R is provided with the following code:<br>
 
 ```r
@@ -32,4 +32,4 @@ devtools::install_git("https://gitlab.inf.unibz.it/REMSEN/CubeR",
 
 #### Contact
 
-For further information please contact: mattia.rossi@eurac.edu
+For further information please contact [Mattia Rossi](mattia.rossi@eurac.edu) or [Daniel Frisinghelli](daniel.frisinghelli@eurac.edu)
