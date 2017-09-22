@@ -5,7 +5,7 @@
 #' @param coords coordinates of the location of interest [character]
 #' @param band1 coverage band [character]
 #' @param band2 coverage band [character]
-#' @param date date range in format "%yyyy-%mm-%dd" [character]
+#' @param date date range in format (Ymd) [character]
 #' @import magrittr
 #' @import urltools
 #' @import httr

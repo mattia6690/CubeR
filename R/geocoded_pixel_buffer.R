@@ -4,7 +4,7 @@
 #' @param coord_sys coordinate system [character]
 #' @param coords coordinates of the location of interest [character]
 #' @param band coverage band [character]
-#' @param date date range in format "%yyyy-%mm-%dd" [character]
+#' @param date date range in format (Ymd) [character]
 #' @import ncdf4
 #' @import urltools
 #' @import httr

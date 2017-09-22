@@ -4,9 +4,6 @@
 #' @param coverage Name of a coverage [character]
 #' @import magrittr
 #' @import xml2
-#' @example
-#' format: coord_sys = c(x, y, time)
-#  example: coord_sys = c("E","N", "DATE")
 #' @export
 
 coverage_get_coordsys <- function(desc_url, coverage){
@@ -32,8 +29,6 @@ coverage_get_coordsys <- function(desc_url, coverage){
 #' @import magrittr
 #' @import xml2
 #' @importFrom stringr str_split
-#' @example
-#' example: sys_Id = "32632"
 #' @export
 
 coverage_get_coordinate_reference <- function(desc_url, coord_url, coverage){
@@ -66,10 +61,6 @@ coverage_get_coordinate_reference <- function(desc_url, coord_url, coverage){
 #' @import magrittr
 #' @import xml2
 #' @importFrom stringr str_split str_replace_all
-#' @example
-#'
-#' tmp_ext = c("2015-06-27T00:00:00.000Z", "2017-09-11T00:00:00.000Z")
-#'
 #' @export
 
 coverage_get_temporal_extent <- function(desc_url, coverage){
@@ -96,10 +87,6 @@ coverage_get_temporal_extent <- function(desc_url, coverage){
 #' @import magrittr
 #' @import xml2
 #' @importFrom stringr str_split
-#' @example
-#'
-#' BB = c("600000","709800", "5090220", "5200020")
-#'
 #' @export
 
 coverage_get_bounding_box <- function(desc_url, coverage){
@@ -128,16 +115,6 @@ coverage_get_bounding_box <- function(desc_url, coverage){
 #' @import magrittr
 #' @import xml2
 #' @importFrom stringr str_split
-#' @example
-#'
-#'  example: av_img_times = c(date_min,
-#'                                     ...             ,
-#'                           "2015-07-04T00:00:00.000Z",
-#'                           "2015-07-24T00:00:00.000Z",
-#'                           "2015-08-03T00:00:00.000Z",
-#'                                     ...             ,
-#'                           date_max)
-#'
 #' @export
 
 coverage_get_timestamps <- function(desc_url, coverage){
@@ -161,10 +138,6 @@ coverage_get_timestamps <- function(desc_url, coverage){
 #' @param coverage Name of a coverage [character]
 #' @import magrittr
 #' @import xml2
-#' @example
-#'
-#' bands = c("AOT", "B02","B03", "B04", ..., "B8A", ... )
-#'
 #' @export
 
 coverage_get_bands <- function(desc_url, coverage){
@@ -187,12 +160,8 @@ coverage_get_bands <- function(desc_url, coverage){
 #' @import magrittr
 #' @import xml2
 #' @importFrom stringr str_split
-#' @example
-#'
-#' resolution = 20 [meters]
-#'
 #' @export
-#'
+
 coverage_get_resolution <- function(desc_url, coverage){
 
   r_xml = xml2::read_xml(paste0(desc_url,coverage))
