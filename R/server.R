@@ -8,7 +8,7 @@ shinyServer(server <- function(input,output){
   })
   
   system_reference <- reactive({
-    reference_Id <- coordsys_reference(desc_url, coord_url, input$coverage)
+    reference_Id <- coverage_get_coordinate_reference(desc_url, coord_url, input$coverage)
     
     sys_xml <- xml2::read_xml(paste0(coord_url,reference_Id))
     
@@ -472,7 +472,7 @@ shinyServer(server <- function(input,output){
     
     eff_date <- av_timestamps()[tmp_date]
     
-    ref_Id <- coordsys_reference(desc_url, coord_url, input$coverage)
+    ref_Id <- coverage_get_coordinate_reference(desc_url, coord_url, input$coverage)
     
     time_img <- image_from_coverage(input$coverage, coordinate_system(), slice_E, slice_N, eff_date,
                                     ref_Id, input$res, input$format, input$SingleChannel)
@@ -499,7 +499,7 @@ shinyServer(server <- function(input,output){
     
     eff_date <- av_timestamps()[tmp_date]
     
-    ref_Id <- coordsys_reference(desc_url, coord_url, input$coverage)
+    ref_Id <- coverage_get_coordinate_reference(desc_url, coord_url, input$coverage)
     
     m_channels <- c(input$band1, input$band2, input$band3)
     
@@ -571,7 +571,7 @@ shinyServer(server <- function(input,output){
     
     eff_date <- av_timestamps()[tmp_date]
     
-    ref_Id <- coordsys_reference(desc_url, coord_url, input$coverage)
+    ref_Id <- coverage_get_coordinate_reference(desc_url, coord_url, input$coverage)
     
     nd_img <- norm_diff_raster(input$coverage, coordinate_system(), slice_E, slice_N, eff_date, ref_Id,
                                     input$res, input$format, input$calc1, input$calc2)

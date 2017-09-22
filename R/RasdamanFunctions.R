@@ -30,7 +30,7 @@
 # For using the code directly in R without the shiny app, #
 # depending packages are listed below and will automatic- #
 # ally be installed.                                      #
-# -------------------------------------------------------
+# ------------------------------------------------------- #
 # Every function is explained in its functionality, input #
 # and output.                                             #
 # ------------------------------------------------------- #
@@ -101,7 +101,7 @@ coverage_get_coordsys <- function(desc_url, coverage){
 }
 
 # Get coverage coordinate system EPSG identifier
-coordsys_reference <- function(desc_url, coord_url, coverage){
+coverage_get_coordinate_reference <- function(desc_url, coord_url, coverage){
   
   #### INPUTS ######################################################################################################
   # -------------------------------------------------------------------------------------------------------------- #
