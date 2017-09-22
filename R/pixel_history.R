@@ -1,4 +1,13 @@
-# Pixel history of "bands" (coverage bands) for a given point determined "coords"
+#' @title Pixel History
+#' @description Pixel history of "bands" (coverage bands) for a given point determined "coords"
+#' @param coverage name of the coverage; class: [character]
+#' @param coord_sys coordinate system; class: [character]
+#' @param bands coverage bands to calculate and visualize pixel history; class: [character]
+#' @param coords coordinates of the location of interest; class: [character]
+#' @param date date range; class: [character, Date]; format: "%yyyy-%mm-%dd";
+#' default: NULL; If date is per default NULL, the pixel history for all available timestamps is computed
+#' @export
+
 pixel_history <- function(coverage, coord_sys, bands, coords, date=NULL){
 
   #### INPUTS ######################################################################################################

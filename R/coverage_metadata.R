@@ -1,5 +1,7 @@
-##### FUNCTIONS FOR QUERYING METADATA ##############################################################################
-
+#' @title Get coordinate system
+#' @description Get the coordinate system of a coverage
+#' @param desc_url Web Coverage Service (WCS) DescribeCoverage url
+#' @param coverage Name of a coverage
 # Get coverage coordinate system
 coverage_get_coordsys <- function(desc_url, coverage){
 
