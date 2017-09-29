@@ -12,16 +12,15 @@ library(devtools)
 library(git2r)
 library(getPass)
 
-uname<-     "Your Gitlab Username"
-password<-  "Your Gitlab Passwort" # Manual insertion
-password<-  getPass::getPass() # Password Popup
-
+uname<- "Your GITLAB username"
 
 devtools::install_git("https://gitlab.inf.unibz.it/REMSEN/CubeR", 
-  credentials = git2r::cred_user_pass(uname, password)
+  credentials = git2r::cred_user_pass(uname, getPass::getPass())
 )
 
 ```
+
+PLEASE NOTE: You need to have an udpated Gitlab Password to access the repository. IF you sign in via the scientific web,your password IS NOT considered as a valid GITLAB account
 
 #### Contributors
 
@@ -32,4 +31,4 @@ devtools::install_git("https://gitlab.inf.unibz.it/REMSEN/CubeR",
 
 #### Contact
 
-For further information please contact [Mattia Rossi](mattia.rossi@eurac.edu) or [Daniel Frisinghelli](daniel.frisinghelli@eurac.edu)
+For further information please contact *mattia.rossi@eurac.edu* or *daniel.frisinghelli@eurac.edu*
