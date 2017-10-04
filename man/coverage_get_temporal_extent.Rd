@@ -2,9 +2,9 @@
 % Please edit documentation in R/coverage_metadata.R
 \name{coverage_get_temporal_extent}
 \alias{coverage_get_temporal_extent}
-\title{Temporal Extent}
+\title{Get Temporal Extent}
 \usage{
-coverage_get_temporal_extent(desc_url, coverage)
+coverage_get_temporal_extent(desc_url = NULL, coverage)
 }
 \arguments{
 \item{desc_url}{Web Coverage Service (WCS) DescribeCoverage url [character]}

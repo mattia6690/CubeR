@@ -4,7 +4,7 @@
 \alias{coverage_get_resolution}
 \title{Get Resolution}
 \usage{
-coverage_get_resolution(desc_url, coverage)
+coverage_get_resolution(desc_url = NULL, coverage)
 }
 \arguments{
 \item{desc_url}{Web Coverage Service (WCS) DescribeCoverage url [character]}
@@ -12,5 +12,5 @@ coverage_get_resolution(desc_url, coverage)
 \item{coverage}{Name of a coverage [character]}
 }
 \description{
-Get the resolution of one coverage
+Get the resolution of one WCS, WCPS coverage
 }

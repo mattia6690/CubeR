@@ -4,7 +4,7 @@
 \alias{coverage_get_timestamps}
 \title{Get Timestamps}
 \usage{
-coverage_get_timestamps(desc_url, coverage)
+coverage_get_timestamps(desc_url = NULL, coverage)
 }
 \arguments{
 \item{desc_url}{Web Coverage Service (WCS) DescribeCoverage url [character]}
@@ -12,5 +12,5 @@ coverage_get_timestamps(desc_url, coverage)
 \item{coverage}{Name of a coverage [character]}
 }
 \description{
-Get coverage's available timestamps (images)
+Get the available timestamps of WCS, WCPS coverage
 }

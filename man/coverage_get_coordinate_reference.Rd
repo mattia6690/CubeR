@@ -4,7 +4,8 @@
 \alias{coverage_get_coordinate_reference}
 \title{Get EPSG identifier}
 \usage{
-coverage_get_coordinate_reference(desc_url, coord_url, coverage)
+coverage_get_coordinate_reference(desc_url = NULL, coord_url = NULL,
+  coverage)
 }
 \arguments{
 \item{desc_url}{Web Coverage Service (WCS) DescribeCoverage url [character]}
@@ -14,5 +15,5 @@ coverage_get_coordinate_reference(desc_url, coord_url, coverage)
 \item{coverage}{Name of a coverage [character]}
 }
 \description{
-Function to extract the EPSG identifier from a WCS coverage
+Function to extract the EPSG identifier from a WCS WCPS coverage
 }

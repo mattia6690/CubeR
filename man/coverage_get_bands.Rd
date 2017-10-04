@@ -4,7 +4,7 @@
 \alias{coverage_get_bands}
 \title{Get Bands}
 \usage{
-coverage_get_bands(desc_url, coverage)
+coverage_get_bands(desc_url = NULL, coverage)
 }
 \arguments{
 \item{desc_url}{Web Coverage Service (WCS) DescribeCoverage url [character]}
@@ -12,5 +12,5 @@ coverage_get_bands(desc_url, coverage)
 \item{coverage}{Name of a coverage [character]}
 }
 \description{
-Get the available bands of one coverage
+Get the available bands of one WCS, WCPS coverage
 }

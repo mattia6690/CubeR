@@ -2,9 +2,9 @@
 % Please edit documentation in R/coverage_metadata.R
 \name{coverage_get_bounding_box}
 \alias{coverage_get_bounding_box}
-\title{Bounding Box}
+\title{Get Bounding Box}
 \usage{
-coverage_get_bounding_box(desc_url, coverage)
+coverage_get_bounding_box(desc_url = NULL, coverage)
 }
 \arguments{
 \item{desc_url}{Web Coverage Service (WCS) DescribeCoverage url [character]}
@@ -12,5 +12,5 @@ coverage_get_bounding_box(desc_url, coverage)
 \item{coverage}{Name of a coverage [character]}
 }
 \description{
-Get a bounding Box of a coverage
+Get a bounding Box of a WCS, WCPS coverage
 }
