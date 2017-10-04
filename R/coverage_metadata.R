@@ -1,3 +1,50 @@
+#' @title List Coverages
+#' @description This function Lists all Coverage inluced in the Datacube
+#' @param url This central URL Leads to the 'ows' page of the Datacube
+#' @import xml2
+#' @export
+
+getCoverage <-function(url=NULL){
+
+  if(is.null(url)){
+    url = "http://10.8.244.147:8080/rasdaman/ows"
+  }
+
+  urlp<-paste0(url,"?SERVICE=WCS&VERSION=2.0.1&REQUEST=GetCapabilities")
+  xml_cov1 <- xml2::read_xml(urlp)
+  xml_cov1 <- xml_text(xml2::xml_find_all(xml_cov1, ".//wcs:CoverageId"))
+
+  return(xml_cov1)
+}
+
+#' @title WCS URL creator
+#' @description This function provides the possibility to construct the url necessary to address different layers of
+#' Metadata. Every Metadata Information in  the WCS OGS format has to be addressed with a differen URL Query.
+#' @param url This central URL Leads to the 'ows' page of the Datacube. If empy the Standard Rasdaman page is used.
+#' @param type characer; Mandatory input for the URL that should be created with the function.
+#' For now the types "Meta", "Pixel","Tiff","Coords","Time" can be created.
+#' @import xml2
+#' @importFrom stringr str_split str_replace_all
+#' @export
+
+createWCS_URLs<-function(url=NULL,type){
+
+  if(is.null(url)){
+    url = "http://10.8.244.147:8080/rasdaman/ows"
+  }
+
+  urlsmall<-str_split(url,"/")[[1]]
+  urlsmall<-paste(urlsmall[1:3],"/",collapse = "") %>% str_replace_all(.," ","")
+
+  if(type=="Meta")  url2<-paste0(url,"?SERVICE=WCS&VERSION=2.0.1&REQUEST=DescribeCoverage&COVERAGEID=")
+  if(type=="Pixel") url2<-paste0(url,"?SERVICE=WCS&VERSION=2.0.1&REQUEST=ProcessCoverages&QUERY=")
+  if(type=="Tiff")  url2<-paste0(url,"?&SERVICE=WCS&VERSION=2.0.1&REQUEST=GetCoverage&COVERAGEID=")
+  if(type=="Coords")url2<-paste0(urlsmall,"/def/crs/EPSG/0/")
+  if(type=="Time")  url2<-paste0(urlsmall,"/def/crs/OGC/0/")
+
+  return(url2)
+}
+
 #' @title Get coordinate system
 #' @description Get the coordinate system of a coverage
 #' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character]
@@ -7,6 +54,8 @@
 #' @export
 
 coverage_get_coordsys <- function(desc_url, coverage){
+
+  if(is.null(desc_url)) desc_url<-createWCS_URLs(type="Meta")
 
   desc_xml = xml2::read_xml(paste0(desc_url,coverage))
 
@@ -22,7 +71,7 @@ coverage_get_coordsys <- function(desc_url, coverage){
 }
 
 #' @title Get EPSG identifier
-#' @description Function to extract the EPSG identifier from a WCS coverage
+#' @description Function to extract the EPSG identifier from a WCS WCPS coverage
 #' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character]
 #' @param coord_url character; Url for retrieving EPSG code [character]
 #' @param coverage Name of a coverage [character]
@@ -31,7 +80,11 @@ coverage_get_coordsys <- function(desc_url, coverage){
 #' @importFrom stringr str_split
 #' @export
 
-coverage_get_coordinate_reference <- function(desc_url, coord_url, coverage){
+coverage_get_coordinate_reference <- function(desc_url=NULL, coord_url=NULL, coverage){
+
+
+  if(is.null(desc_url)) desc_url<-createWCS_URLs(type="Meta")
+  if(is.null(desc_url)) coord_url<-createWCS_URLs(type="Coords")
 
   d_xml <- xml2::read_xml(paste0(desc_url,coverage))
 
@@ -54,7 +107,7 @@ coverage_get_coordinate_reference <- function(desc_url, coord_url, coverage){
 
 }
 
-#' @title Temporal Extent
+#' @title Get Temporal Extent
 #' @description Get the temporal extent from a WCS WCPS Coverage
 #' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character]
 #' @param coverage Name of a coverage [character]
@@ -63,8 +116,9 @@ coverage_get_coordinate_reference <- function(desc_url, coord_url, coverage){
 #' @importFrom stringr str_split str_replace_all
 #' @export
 
-coverage_get_temporal_extent <- function(desc_url, coverage){
+coverage_get_temporal_extent <- function(desc_url=NULL, coverage){
 
+  if(is.null(desc_url)) desc_url<-createWCS_URLs(type="Meta")
 
   t_xml = xml2::read_xml(paste0(desc_url,coverage))
 
@@ -80,8 +134,8 @@ coverage_get_temporal_extent <- function(desc_url, coverage){
 
 }
 
-#' @title Bounding Box
-#' @description Get a bounding Box of a coverage
+#' @title Get Bounding Box
+#' @description Get a bounding Box of a WCS, WCPS coverage
 #' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character]
 #' @param coverage Name of a coverage [character]
 #' @import magrittr
@@ -89,7 +143,9 @@ coverage_get_temporal_extent <- function(desc_url, coverage){
 #' @importFrom stringr str_split
 #' @export
 
-coverage_get_bounding_box <- function(desc_url, coverage){
+coverage_get_bounding_box <- function(desc_url=NULL, coverage){
+
+  if(is.null(desc_url)) desc_url<-createWCS_URLs(type="Meta")
 
   s_xml = xml2::read_xml(paste0(desc_url,coverage))
 
@@ -109,7 +165,7 @@ coverage_get_bounding_box <- function(desc_url, coverage){
 }
 
 #' @title Get Timestamps
-#' @description Get coverage's available timestamps (images)
+#' @description Get the available timestamps of WCS, WCPS coverage
 #' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character]
 #' @param coverage Name of a coverage [character]
 #' @import magrittr
@@ -117,7 +173,9 @@ coverage_get_bounding_box <- function(desc_url, coverage){
 #' @importFrom stringr str_split
 #' @export
 
-coverage_get_timestamps <- function(desc_url, coverage){
+coverage_get_timestamps <- function(desc_url=NULL, coverage){
+
+  if(is.null(desc_url)) desc_url<-createWCS_URLs(type="Meta")
 
   i_xml = xml2::read_xml(paste0(desc_url,coverage))
 
@@ -133,14 +191,16 @@ coverage_get_timestamps <- function(desc_url, coverage){
 }
 
 #' @title Get Bands
-#' @description Get the available bands of one coverage
+#' @description Get the available bands of one WCS, WCPS coverage
 #' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character]
 #' @param coverage Name of a coverage [character]
 #' @import magrittr
 #' @import xml2
 #' @export
 
-coverage_get_bands <- function(desc_url, coverage){
+coverage_get_bands <- function(desc_url=NULL, coverage){
+
+  if(is.null(desc_url)) desc_url<-createWCS_URLs(type="Meta")
 
   b_xml = xml2::read_xml(paste0(desc_url,coverage))
 
@@ -154,7 +214,7 @@ coverage_get_bands <- function(desc_url, coverage){
 }
 
 #' @title Get Resolution
-#' @description Get the resolution of one coverage
+#' @description Get the resolution of one WCS, WCPS coverage
 #' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character]
 #' @param coverage Name of a coverage [character]
 #' @import magrittr
@@ -162,7 +222,9 @@ coverage_get_bands <- function(desc_url, coverage){
 #' @importFrom stringr str_split
 #' @export
 
-coverage_get_resolution <- function(desc_url, coverage){
+coverage_get_resolution <- function(desc_url=NULL, coverage){
+
+  if(is.null(desc_url)) desc_url<-createWCS_URLs(type="Meta")
 
   r_xml = xml2::read_xml(paste0(desc_url,coverage))
 
