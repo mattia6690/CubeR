@@ -5,13 +5,22 @@
 #' @param bands coverage bands to calculate and visualize pixel history [character]
 #' @param coords coordinates of the location of interest [character]
 #' @param date date range in format (Ymd) [character]
+#' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character].
+#' This URL can be built with the *createWCS_URLs* function
+#' @param pixel_url Web Coverage Service (WCS) for processing the query [character].
+#' This URL can be built with the *createWCS_URLs* function
 #' @import stringr
 #' @import magrittr
 #' @import urltools
 #' @import httr
 #' @export
 
-pixel_history <- function(coverage, coord_sys, bands, coords, date = NULL){
+pixel_history <- function(coverage, coord_sys, bands, coords, date = NULL,
+                          desc_url=NULL,pixel_url=NULL){
+
+
+  if(is.null(desc_url)) desc_url<-createWCS_URLs(type="Meta")
+  if(is.null(pixel_url)) pixel_url<-createWCS_URLs(type="Pixel")
 
   times<-coverage_get_timestamps(desc_url,coverage)
 

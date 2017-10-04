@@ -5,6 +5,8 @@
 #' @param coords coordinates of the location of interest [character]
 #' @param band coverage band [character]
 #' @param date date range in format (Ymd) [character]
+#' @param pixel_url Web Coverage Service (WCS) for processing the query [character].
+#' This URL can be built with the *createWCS_URLs* function
 #' @import ncdf4
 #' @import urltools
 #' @import httr
@@ -14,7 +16,10 @@
 #' @import graphics
 #' @export
 
-geocoded_pixel_buffer <- function(coverage, coord_sys, coords, band, buffer, date = NULL){
+geocoded_pixel_buffer <- function(coverage, coord_sys, coords, band, buffer, date = NULL,
+                                  pixel_url=NULL){
+
+  if(is.null(pixel_url)) pixel_url<-createWCS_URLs(type="Pixel")
 
   bounding_box <- round(c(as.numeric(coords[1]) - as.numeric(buffer),
                           as.numeric(coords[1]) + as.numeric(buffer),

@@ -6,14 +6,21 @@
 #' @param band1 coverage band [character]
 #' @param band2 coverage band [character]
 #' @param date date range in format (Ymd) [character]
+#' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character].
+#' This URL can be built with the *createWCS_URLs* function
+#' @param pixel_url Web Coverage Service (WCS) for processing the query [character].
+#' This URL can be built with the *createWCS_URLs* function
 #' @import magrittr
 #' @import urltools
 #' @import httr
 #' @import stringr
 #' @export
 
-norm_diff_hist <- function(coverage, coord_sys, coords, band1, band2, date = NULL){
+norm_diff_hist <- function(coverage, coord_sys, coords, band1, band2, date = NULL,
+                           desc_url=NULL,pixel_url=NULL){
 
+  if(is.null(desc_url)) desc_url<-createWCS_URLs(type="Meta")
+  if(is.null(pixel_url)) pixel_url<-createWCS_URLs(type="Pixel")
   if(is.null(band1) | is.null(band2)){
 
     p <- plot(1, type = "n", axes = FALSE, xlab = "", ylab = "")

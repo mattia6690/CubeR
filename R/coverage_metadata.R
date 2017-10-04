@@ -47,7 +47,8 @@ createWCS_URLs<-function(url=NULL,type){
 
 #' @title Get coordinate system
 #' @description Get the coordinate system of a coverage
-#' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character]
+#' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character].
+#' This URL can be built with the *createWCS_URLs* funtion
 #' @param coverage Name of a coverage [character]
 #' @import magrittr
 #' @import xml2
@@ -72,8 +73,10 @@ coverage_get_coordsys <- function(desc_url, coverage){
 
 #' @title Get EPSG identifier
 #' @description Function to extract the EPSG identifier from a WCS WCPS coverage
-#' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character]
+#' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character].
+#' This URL can be built with the *createWCS_URLs* funtion
 #' @param coord_url character; Url for retrieving EPSG code [character]
+#' This URL can be built with the *createWCS_URLs* funtion
 #' @param coverage Name of a coverage [character]
 #' @import magrittr
 #' @import xml2
@@ -110,6 +113,7 @@ coverage_get_coordinate_reference <- function(desc_url=NULL, coord_url=NULL, cov
 #' @title Get Temporal Extent
 #' @description Get the temporal extent from a WCS WCPS Coverage
 #' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character]
+#' This URL can be built with the *createWCS_URLs* funtion
 #' @param coverage Name of a coverage [character]
 #' @import magrittr
 #' @import xml2
@@ -137,6 +141,7 @@ coverage_get_temporal_extent <- function(desc_url=NULL, coverage){
 #' @title Get Bounding Box
 #' @description Get a bounding Box of a WCS, WCPS coverage
 #' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character]
+#' This URL can be built with the *createWCS_URLs* funtion
 #' @param coverage Name of a coverage [character]
 #' @import magrittr
 #' @import xml2
@@ -167,6 +172,7 @@ coverage_get_bounding_box <- function(desc_url=NULL, coverage){
 #' @title Get Timestamps
 #' @description Get the available timestamps of WCS, WCPS coverage
 #' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character]
+#' This URL can be built with the *createWCS_URLs* funtion
 #' @param coverage Name of a coverage [character]
 #' @import magrittr
 #' @import xml2
@@ -193,6 +199,7 @@ coverage_get_timestamps <- function(desc_url=NULL, coverage){
 #' @title Get Bands
 #' @description Get the available bands of one WCS, WCPS coverage
 #' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character]
+#' This URL can be built with the *createWCS_URLs* funtion
 #' @param coverage Name of a coverage [character]
 #' @import magrittr
 #' @import xml2
@@ -216,6 +223,7 @@ coverage_get_bands <- function(desc_url=NULL, coverage){
 #' @title Get Resolution
 #' @description Get the resolution of one WCS, WCPS coverage
 #' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character]
+#' This URL can be built with the *createWCS_URLs* funtion
 #' @param coverage Name of a coverage [character]
 #' @import magrittr
 #' @import xml2

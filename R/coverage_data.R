@@ -9,13 +9,18 @@
 #' @param res_eff factor to scale raster resolution [numeric]
 #' @param format image format in WCPS query [character]
 #' @param bands coverage bands to calculate raster [character]
+#' @param pixel_url Web Coverage Service (WCS) for processing the query [character].
+#' This URL can be built with the *createWCS_URLs* function
 #' @import urltools
 #' @import httr
 #' @import raster
 #' @importFrom sp proj4string
 #' @export
 
-image_from_coverage <- function(coverage, coord_sys, slice_E, slice_N, date, ref_Id, res_eff, format, bands){
+image_from_coverage <- function(coverage, coord_sys, slice_E, slice_N, date, ref_Id, res_eff, format, bands,
+                                pixel_url=NULL){
+
+  if(is.null(pixel_url)) pixel_url<-createWCS_URLs(type="Pixel")
 
   bands_len <- length(bands)
   rasters <- list()
