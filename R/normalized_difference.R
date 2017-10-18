@@ -94,7 +94,7 @@ norm_diff_hist <- function(coverage, coord_sys, coords, band1, band2, date = NUL
 #' @import urltools
 #' @import httr
 #' @import raster
-#' @importFrom sp proj4string
+#' @import sp
 #' @export
 
 norm_diff_raster <- function(coverage, coord_sys, slice_E, slice_N, date, ref_Id, res_eff, format,
