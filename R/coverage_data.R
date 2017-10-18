@@ -17,7 +17,7 @@
 #' @import tiff
 #' @import png
 #' @import jpeg
-#' @importFrom sp proj4string, CRS
+#' @importFrom sp proj4string CRS
 #' @export
 
 image_from_coverage <- function(coverage, coord_sys, slice_E, slice_N, date, ref_Id, res_eff, format, bands,
