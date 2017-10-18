@@ -7,7 +7,8 @@
 coverage_get_temporal_extent(desc_url = NULL, coverage)
 }
 \arguments{
-\item{desc_url}{Web Coverage Service (WCS) DescribeCoverage url [character]}
+\item{desc_url}{Web Coverage Service (WCS) DescribeCoverage url [character]
+This URL can be built with the *createWCS_URLs* funtion}
 
 \item{coverage}{Name of a coverage [character]}
 }

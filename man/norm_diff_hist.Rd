@@ -4,7 +4,8 @@
 \alias{norm_diff_hist}
 \title{Calculate Normalized Difference Pixel History}
 \usage{
-norm_diff_hist(coverage, coord_sys, coords, band1, band2, date = NULL)
+norm_diff_hist(coverage, coord_sys, coords, band1, band2, date = NULL,
+  desc_url = NULL, pixel_url = NULL)
 }
 \arguments{
 \item{coverage}{name of the coverage [character]}
@@ -18,6 +19,12 @@ norm_diff_hist(coverage, coord_sys, coords, band1, band2, date = NULL)
 \item{band2}{coverage band [character]}
 
 \item{date}{date range in format (Ymd) [character]}
+
+\item{desc_url}{Web Coverage Service (WCS) DescribeCoverage url [character].
+This URL can be built with the *createWCS_URLs* function}
+
+\item{pixel_url}{Web Coverage Service (WCS) for processing the query [character].
+This URL can be built with the *createWCS_URLs* function}
 }
 \description{
 Calculate normalized difference pixel history between band1 and band2

@@ -8,9 +8,11 @@ coverage_get_coordinate_reference(desc_url = NULL, coord_url = NULL,
   coverage)
 }
 \arguments{
-\item{desc_url}{Web Coverage Service (WCS) DescribeCoverage url [character]}
+\item{desc_url}{Web Coverage Service (WCS) DescribeCoverage url [character].
+This URL can be built with the *createWCS_URLs* funtion}
 
-\item{coord_url}{character; Url for retrieving EPSG code [character]}
+\item{coord_url}{character; Url for retrieving EPSG code [character]
+This URL can be built with the *createWCS_URLs* funtion}
 
 \item{coverage}{Name of a coverage [character]}
 }

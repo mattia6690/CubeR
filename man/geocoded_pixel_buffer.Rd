@@ -4,7 +4,8 @@
 \alias{geocoded_pixel_buffer}
 \title{Calculate Pixel Buffer History}
 \usage{
-geocoded_pixel_buffer(coverage, coord_sys, coords, band, buffer, date = NULL)
+geocoded_pixel_buffer(coverage, coord_sys, coords, band, buffer, date = NULL,
+  pixel_url = NULL)
 }
 \arguments{
 \item{coverage}{name of the coverage [character]}
@@ -16,6 +17,9 @@ geocoded_pixel_buffer(coverage, coord_sys, coords, band, buffer, date = NULL)
 \item{band}{coverage band [character]}
 
 \item{date}{date range in format (Ymd) [character]}
+
+\item{pixel_url}{Web Coverage Service (WCS) for processing the query [character].
+This URL can be built with the *createWCS_URLs* function}
 }
 \description{
 Calculate pixel buffer history of a coverage band
