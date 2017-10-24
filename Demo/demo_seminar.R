@@ -62,7 +62,7 @@ print(length(times))
 # Reference coordinate System: determined via EPSG identifier
 # EPSG url:
 EPSG_url <- createWCS_URLs(type = "Coords")
-EPSG_id <- coord_sys_reference <- coverage_get_coordinate_reference(meta_url, EPSG_url, coverage)
+EPSG_id <- coverage_get_coordinate_reference(meta_url, EPSG_url, coverage)
 EPSG <- "WGS 84 / UTM zone 32N"
 print(paste0("EPSG identifier ", EPSG_id, " = ", EPSG))
 
