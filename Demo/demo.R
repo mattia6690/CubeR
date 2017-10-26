@@ -10,17 +10,11 @@ uname <- "Daniel.Frisinghelli"
 devtools::install_git("https://gitlab.inf.unibz.it/REMSEN/CubeR",
                       credentials = git2r::cred_user_pass(uname, getPass::getPass()))
 
-##################################################
-
-#### LOAD PACKAGE TO ENVIRONMENT #################
-library(CubeR)
-
-# list all functions in the package
-ls("package:CubeR")
+library(CubeR) # OPEN PACKAGE IN PACKAGES
 
 ##################################################
 
-#### DEMONSTRATION OF USAGE ######################
+#### USECASE: CONNECT TO SERVER ##################
 
 # Get capabilities: List all coverages on the server
 capabs <- getCoverage()
@@ -29,6 +23,8 @@ print(capabs)
 # Select a coverage
 coverage <- capabs[7]
 print(coverage)
+
+##################################################
 
 #### METADATA ####
 
