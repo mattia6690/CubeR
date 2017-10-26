@@ -98,7 +98,9 @@ norm_diff_hist <- function(coverage, coord_sys, coords, band1, band2, date = NUL
 #' @export
 
 norm_diff_raster <- function(coverage, coord_sys, slice_E, slice_N, date, ref_Id, res_eff, format,
-                             band_1, band_2){
+                             band_1, band_2, pixel_url = NULL){
+
+  if(is.null(pixel_url)) pixel_url<-createWCS_URLs(type="Pixel")
 
   query = paste0('for c in (', coverage, ') ', 'return encode ((unsigned char)(127.5*(1+( (int) ',
                  'c.',band_1,'[',
