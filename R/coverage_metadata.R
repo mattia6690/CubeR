@@ -54,7 +54,7 @@ createWCS_URLs<-function(url=NULL,type){
 #' @import xml2
 #' @export
 
-coverage_get_coordsys <- function(desc_url, coverage){
+coverage_get_coordsys <- function(desc_url = NULL, coverage){
 
   if(is.null(desc_url)) desc_url<-createWCS_URLs(type="Meta")
 

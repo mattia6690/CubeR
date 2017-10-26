@@ -37,7 +37,7 @@ print(coverage)
 ### Example 1: query bounding box ###
 
 # Bounding Box: (xmin, xmax, ymin, ymax)
-BB <- coverage_get_bounding_box(coverage)
+BB <- coverage_get_bounding_box(coverage = coverage)
 print(BB)
 
 
@@ -45,7 +45,7 @@ print(BB)
 ### Example 2: timestamps ###
 
 # Get timestamps
-times <- coverage_get_timestamps(coverage)
+times <- coverage_get_timestamps(coverage = coverage)
 
 print(times) # timestamps of image
 print(length(times)) # number of available images
@@ -53,7 +53,7 @@ print(length(times)) # number of available images
 
 
 ### Example 3: bands ###
-bands <- coverage_get_bands(coverage)
+bands <- coverage_get_bands(coverage = coverage)
 print(bands)
 
 ##################################################
@@ -65,14 +65,13 @@ print(bands)
 library(leaflet)
 library(rgdal)
 
-coord_sys <- coverage_get_coordsys(coverage)
-bands <- coverage_get_bands(coverage)
+coord_sys <- coverage_get_coordsys(coverage = coverage)
 BB_num <- as.numeric(BB)
 coords <- as.character(c(BB_num[1]+(BB_num[2]-BB_num[1])/2, BB_num[3]+(BB_num[4]-BB_num[3])/2))
 slice_E <- as.character(c(as.numeric(coords[1])-5000, as.numeric(coords[1])+5000))
 slice_N <- as.character(c(as.numeric(coords[2])-5000, as.numeric(coords[2])+5000))
 date = times[1]
-EPSG_id <- coverage_get_coordinate_reference(coverage)
+EPSG_id <- coverage_get_coordinate_reference(coverage = coverage)
 NDVI_colormap <- colorRampPalette(c("blue","cadetblue","azure","grey","brown","yellow","green"))
 ##################################################
 
