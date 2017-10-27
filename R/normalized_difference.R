@@ -69,8 +69,7 @@ norm_diff_hist <- function(coverage, coord_sys, coords, band1, band2, date = NUL
 
     res <- bin
 
-    out <- c(times, res)
-
+    out <- cbind(times, res)
   }
 
   if(plot == TRUE){
