@@ -10,6 +10,9 @@ uname <- "Daniel.Frisinghelli"
 devtools::install_git("https://gitlab.inf.unibz.it/REMSEN/CubeR",
                       credentials = git2r::cred_user_pass(uname, getPass::getPass()))
 
+devtools::install_git("https://gitlab.inf.unibz.it/REMSEN/MonalisR",
+                      credentials = git2r::cred_user_pass(uname, getPass::getPass()))
+
 library(CubeR) # OPEN PACKAGE IN PACKAGES
 
 ##################################################
@@ -17,7 +20,7 @@ library(CubeR) # OPEN PACKAGE IN PACKAGES
 
 
 
-#### USECASE: CONNECT TO SERVER ##################
+#### USECASE: CONNECT TO SERVICE #################
 
 # Get capabilities: List all coverages on the server
 capabs <- getCoverage()
@@ -90,9 +93,10 @@ pxl_hst_5 <- pixel_history(coverage, coord_sys, bands[2:7], coords, date = NULL)
 
 
 
+
 ### Example 2: normalized difference history ###
-Red <- bands[4]
 NIR <- bands[8]
+Red <- bands[4]
 
 # History of NDVI in this case
 x11()
@@ -117,4 +121,35 @@ lflt %>% clearImages() %>% addRasterImage(nd_img[[1]], colors = NDVI_colormap(25
   addLegend("bottomleft", colors = NDVI_colormap(11), labels = seq(-1,1,by = 2/10))
 
 ##################################################
+
+
+
+
+#### COMBINING THINGS ############################
+
+# UTM 32N coordinates of vimes1500
+East <- "620812.02"
+North <- "5171499.36"
+
+# S2A timeseries
+coords <- c(East, North)
+tstmp_value <- norm_diff_hist(coverage, coord_sys, coords, NIR, Red, date = NULL, plot = FALSE)
+
+tstmp <- as.Date(tstmp_value[,1], origin = "1970-01-01")
+value <- tstmp_value[,2]
+
+p<-plot(tstmp,value,type="o", lwd = 2, xlab="Date", ylab="Normalized difference", ylim = c(-1,1), cex.axis = 1.2, cex.lab = 1.2)
+p<-legend("topright", inset = .02,legend=paste0(NIR," - ",Red), pch=15)
+p<-title(paste0("Normalized Difference between ", NIR, " and ", Red))
+
+# In-situ timeseries
+
+
+##################################################
+
+
+
+
+
+
 
