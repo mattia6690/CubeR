@@ -25,6 +25,8 @@ This URL can be built with the *createWCS_URLs* function}
 
 \item{pixel_url}{Web Coverage Service (WCS) for processing the query [character].
 This URL can be built with the *createWCS_URLs* function}
+
+\item{plot}{handler if a plot is returned or a vector containing timestamp and value}
 }
 \description{
 Calculate normalized difference pixel history between band1 and band2

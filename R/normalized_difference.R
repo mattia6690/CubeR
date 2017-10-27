@@ -10,6 +10,7 @@
 #' This URL can be built with the *createWCS_URLs* function
 #' @param pixel_url Web Coverage Service (WCS) for processing the query [character].
 #' This URL can be built with the *createWCS_URLs* function
+#' @param plot handler if a plot is returned or a vector containing timestamp and value
 #' @import magrittr
 #' @import urltools
 #' @import httr
