@@ -4,7 +4,7 @@
 \alias{coverage_get_coordsys}
 \title{Get coordinate system}
 \usage{
-coverage_get_coordsys(desc_url, coverage)
+coverage_get_coordsys(desc_url = NULL, coverage)
 }
 \arguments{
 \item{desc_url}{Web Coverage Service (WCS) DescribeCoverage url [character].

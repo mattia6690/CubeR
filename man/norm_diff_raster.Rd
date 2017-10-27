@@ -5,7 +5,7 @@
 \title{Calculate Normalized Difference Raster Layer}
 \usage{
 norm_diff_raster(coverage, coord_sys, slice_E, slice_N, date, ref_Id, res_eff,
-  format, band_1, band_2)
+  format, band_1, band_2, pixel_url = NULL)
 }
 \arguments{
 \item{coverage}{name of the coverage [character]}

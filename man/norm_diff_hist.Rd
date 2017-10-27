@@ -5,7 +5,7 @@
 \title{Calculate Normalized Difference Pixel History}
 \usage{
 norm_diff_hist(coverage, coord_sys, coords, band1, band2, date = NULL,
-  desc_url = NULL, pixel_url = NULL)
+  desc_url = NULL, pixel_url = NULL, plot = TRUE)
 }
 \arguments{
 \item{coverage}{name of the coverage [character]}
