@@ -17,7 +17,7 @@
 #' @export
 
 norm_diff_hist <- function(coverage, coord_sys, coords, band1, band2, date = NULL,
-                           desc_url=NULL,pixel_url=NULL){
+                           desc_url=NULL,pixel_url=NULL, plot = TRUE){
 
   if(is.null(desc_url)) desc_url<-createWCS_URLs(type="Meta")
   if(is.null(pixel_url)) pixel_url<-createWCS_URLs(type="Pixel")
@@ -69,13 +69,24 @@ norm_diff_hist <- function(coverage, coord_sys, coords, band1, band2, date = NUL
 
     res <- bin
 
+    out <- c(times, res)
+
+  }
+
+  if(plot == TRUE){
     p<-plot(times,res,type="o", lwd = 2, xlab="Date", ylab="Normalized difference", ylim = c(-1,1), cex.axis = 1.2, cex.lab = 1.2)
     p <-legend("topright", inset = .02,legend=paste0(band1," - ",band2), pch=15)
     p<-title(paste0("Normalized Difference between ", band1, " and ", band2))
 
+    return(p)
+
+  } else {
+
+    return(out)
+
   }
 
-  return(p)
+
 
 }
 
