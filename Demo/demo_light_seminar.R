@@ -10,9 +10,6 @@ uname <- "Daniel.Frisinghelli"
 devtools::install_git("https://gitlab.inf.unibz.it/REMSEN/CubeR",
                       credentials = git2r::cred_user_pass(uname, getPass::getPass()))
 
-devtools::install_git("https://gitlab.inf.unibz.it/REMSEN/MonalisR",
-                      credentials = git2r::cred_user_pass(uname, getPass::getPass()))
-
 library(CubeR) # OPEN PACKAGE IN PACKAGES
 
 ##################################################
@@ -67,6 +64,8 @@ print(bands)
 #### INPUTS FOR ANALYSIS #########################
 library(leaflet)
 library(rgdal)
+library("magrittr")
+library("stringr")
 
 coord_sys <- coverage_get_coordsys(coverage = coverage)
 BB_num <- as.numeric(BB)
@@ -84,11 +83,11 @@ NDVI_colormap <- colorRampPalette(c("blue","cadetblue","azure","grey","brown","y
 #### USECASE: ANALYSIS ###########################
 
 ### Example 1: pixel history ###
-x11()
+x11(12,8, xpos = - 400, ypos = 100)
 pxl_hst_1 <- pixel_history(coverage, coord_sys, bands[2], coords, date = NULL)
 
 # Multiple bands possible
-x11()
+x11(12,8, xpos = - 400, ypos = 100)
 pxl_hst_5 <- pixel_history(coverage, coord_sys, bands[2:7], coords, date = NULL)
 
 
@@ -99,7 +98,7 @@ NIR <- bands[8]
 Red <- bands[4]
 
 # History of NDVI in this case
-x11()
+x11(12,8, xpos = - 400, ypos = 100)
 norm_dff_hist <- norm_diff_hist(coverage, coord_sys, coords, NIR, Red, date = NULL)
 
 
@@ -131,19 +130,41 @@ lflt %>% clearImages() %>% addRasterImage(nd_img[[1]], colors = NDVI_colormap(25
 East <- "620812.02"
 North <- "5171499.36"
 
+# time range
+s <- "2016-01-01"
+e <- "2016-12-31"
+
 # S2A timeseries
 coords <- c(East, North)
-tstmp_value <- norm_diff_hist(coverage, coord_sys, coords, NIR, Red, date = NULL, plot = FALSE)
+tstmp_value <- norm_diff_hist(coverage, coord_sys, coords, NIR, Red, date = c(s,e), plot = FALSE)
 
 tstmp <- as.Date(tstmp_value[,1], origin = "1970-01-01")
 value <- tstmp_value[,2]
 
-p<-plot(tstmp,value,type="o", lwd = 2, xlab="Date", ylab="Normalized difference", ylim = c(-1,1), cex.axis = 1.2, cex.lab = 1.2)
-p<-legend("topright", inset = .02,legend=paste0(NIR," - ",Red), pch=15)
+# In-situ timeseries
+devtools::install_git("https://gitlab.inf.unibz.it/REMSEN/MonalisR",
+                      credentials = git2r::cred_user_pass(uname, getPass::getPass()))
+library(MonalisR)
+
+s <- paste0(s, " 00:00")
+e <- paste0(e, " 00:00")
+
+mnls_down<-downloadMonalisa(foi="vimes1500",datestart = s,dateend = e)
+time<-mnls_down[[1]]$Timestamp %>% str_split(.," ") %>% lapply(.,"[[",2) %>% do.call(rbind,.)
+
+mnls_vimes1500<-mnls_down[[1]][which(time=="10:30:00"),]
+
+# plot data
+x11(12,8, xpos = - 400, ypos = 100)
+plot(tstmp,value,type="o", lwd = 2, xlab="Date", ylab="Normalized difference", ylim = c(-1,1),
+     cex.axis = 1.2, cex.lab = 1.2)
+par(new = TRUE)
+plot(mnls_vimes1500$Timestamp, mnls_vimes1500$`Normalized Difference Vegetation Index (average)`,
+     type = "o", col = "red", xlab = "", ylab = "", axes = FALSE, lwd = 2)
 p<-title(paste0("Normalized Difference between ", NIR, " and ", Red))
 
-# In-situ timeseries
-
+p<-legend("topright", inset = .02,legend=c("Sentinel 2: B8A - B04", "In situ: NDVI (avg)"),
+          col = c("black","red"), pch=15)
 
 ##################################################
 
