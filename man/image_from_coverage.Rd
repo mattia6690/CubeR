@@ -4,8 +4,9 @@
 \alias{image_from_coverage}
 \title{Get a raster from the coverage}
 \usage{
-image_from_coverage(coverage, coord_sys, slice_E, slice_N, date, ref_Id,
-  res_eff, format, bands, pixel_url = NULL)
+image_from_coverage(coverage, coord_sys, slice_E, slice_N, date,
+  ref_Id = NULL, res_eff = NULL, format = "Tiff", bands = NULL,
+  pixel_url = NULL)
 }
 \arguments{
 \item{coverage}{name of the coverage [character]}
