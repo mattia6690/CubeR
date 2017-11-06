@@ -5,8 +5,8 @@
 \title{Get a raster from the coverage}
 \usage{
 image_from_coverage(coverage, coord_sys, slice_E, slice_N, date,
-  ref_Id = NULL, res_eff = NULL, format = "Tiff", bands = NULL,
-  pixel_url = NULL)
+  ref_Id = NULL, res_eff = NULL, format = "TIFF", bands = NULL,
+  pixel_url = NULL, filename = NULL)
 }
 \arguments{
 \item{coverage}{name of the coverage [character]}
@@ -25,10 +25,11 @@ image_from_coverage(coverage, coord_sys, slice_E, slice_N, date,
 
 \item{format}{image format in WCPS query [character]}
 
-\item{bands}{coverage bands to calculate raster [character]}
+\item{bands}{coverage bands to calculate raster. Can contain one or more bands from the same coverage [character]}
 
-\item{pixel_url}{Web Coverage Service (WCS) for processing the query [character].
-This URL can be built with the *createWCS_URLs* function}
+\item{pixel_url}{Web Coverage Service (WCS) for processing the query. This URL can be built with the *createWCS_URLs* function. [character]}
+
+\item{filename}{If the raster image should be saved please digit a path and a filename. [character]}
 }
 \description{
 Calculate raster layer(s) of the coverage
