@@ -19,7 +19,7 @@
 #' @import jpeg
 #' @import sp
 #' @export
-image_from_coverage <- function(coverage, coord_sys, slice_E, slice_N, date, ref_Id=NULL, res_eff=NULL, format="Tiff", bands=NULL,
+image_from_coverage <- function(coverage, coord_sys, slice_E, slice_N, date, ref_Id=NULL, res_eff=NULL, format="TIFF", bands=NULL,
                                 pixel_url=NULL){
 
   if(is.null(pixel_url)) pixel_url<-createWCS_URLs(type="Pixel")
@@ -43,7 +43,7 @@ image_from_coverage <- function(coverage, coord_sys, slice_E, slice_N, date, ref
 
     res <- GET(request)
     bin <- content(res, "raw")
-    to_img  <- get(paste0("read",format))
+    to_img  <- get(paste0("read",toupper(format)))
     img     <- to_img(bin,as.is = T)
 
     ras_ext <- extent(c(as.numeric(slice_E), as.numeric(slice_N)))
