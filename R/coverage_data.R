@@ -8,9 +8,9 @@
 #' @param ref_Id EPSG code of the coordinate system [character]
 #' @param res_eff factor to scale raster resolution [numeric]
 #' @param format image format in WCPS query [character]
-#' @param bands coverage bands to calculate raster [character]
-#' @param pixel_url Web Coverage Service (WCS) for processing the query [character].
-#' This URL can be built with the *createWCS_URLs* function
+#' @param bands coverage bands to calculate raster. Can contain one or more bands from the same coverage [character]
+#' @param pixel_url Web Coverage Service (WCS) for processing the query. This URL can be built with the *createWCS_URLs* function. [character]
+#' @param filename If the raster image should be saved please digit a path and a filename. [character]
 #' @import urltools
 #' @import httr
 #' @import raster
@@ -20,7 +20,7 @@
 #' @import sp
 #' @export
 image_from_coverage <- function(coverage, coord_sys, slice_E, slice_N, date, ref_Id=NULL, res_eff=NULL, format="TIFF", bands=NULL,
-                                pixel_url=NULL){
+                                pixel_url=NULL,filename=NULL){
 
   if(is.null(pixel_url)) pixel_url<-createWCS_URLs(type="Pixel")
   if(is.null(ref_Id))    ref_Id<-coverage_get_coordinate_reference(coverage = coverage)
@@ -44,7 +44,7 @@ image_from_coverage <- function(coverage, coord_sys, slice_E, slice_N, date, ref
     res <- GET(request)
     bin <- content(res, "raw")
     to_img  <- get(paste0("read",toupper(format)))
-    img     <- to_img(bin,as.is = T)
+    img     <- to_img(bin, as.is = T)
 
     ras_ext <- extent(c(as.numeric(slice_E), as.numeric(slice_N)))
     ras     <-raster(img)
@@ -70,6 +70,16 @@ image_from_coverage <- function(coverage, coord_sys, slice_E, slice_N, date, ref
 
   }
 
-  return(rasters)
+  if(!is.null(filename)){
+
+    rasters<-stack(rasters)
+    writeRaster(rasters,filename)
+
+  }else{
+
+    return(rasters)
+
+  }
+
 
 }
