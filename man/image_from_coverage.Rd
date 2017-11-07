@@ -2,7 +2,7 @@
 % Please edit documentation in R/coverage_data.R
 \name{image_from_coverage}
 \alias{image_from_coverage}
-\title{Get a raster from the coverage}
+\title{Get a raster from coverage}
 \usage{
 image_from_coverage(coverage, coord_sys, slice_E, slice_N, date,
   ref_Id = NULL, res_eff = NULL, format = "TIFF", bands = NULL,
@@ -32,5 +32,6 @@ image_from_coverage(coverage, coord_sys, slice_E, slice_N, date,
 \item{filename}{If the raster image should be saved please digit a path and a filename. [character]}
 }
 \description{
-Calculate raster layer(s) of the coverage
+This function provides the possibility to interact directly with the data cubes. It gives the option to write the images to
+memory or on the hard drive for further computation.
 }

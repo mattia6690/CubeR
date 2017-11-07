@@ -1,5 +1,6 @@
-#' @title Get a raster from the coverage
-#' @description Calculate raster layer(s) of the coverage
+#' @title Get a raster from coverage
+#' @description This function provides the possibility to interact directly with the data cubes. It gives the option to write the images to
+#' memory or on the hard drive for further computation.
 #' @param coverage name of the coverage [character]
 #' @param coord_sys coordinate system [character]
 #' @param slice_E image slicing coordinates in x-direction [character]
@@ -11,7 +12,7 @@
 #' @param bands coverage bands to calculate raster. Can contain one or more bands from the same coverage [character]
 #' @param pixel_url Web Coverage Service (WCS) for processing the query. This URL can be built with the *createWCS_URLs* function. [character]
 #' @param filename If the raster image should be saved please digit a path and a filename. [character]
-#' @import urltools
+#' @importFrom urltools url_encode
 #' @import httr
 #' @import raster
 #' @import tiff
@@ -23,7 +24,7 @@ image_from_coverage <- function(coverage, coord_sys, slice_E, slice_N, date, ref
                                 pixel_url=NULL,filename=NULL){
 
   if(is.null(pixel_url)) pixel_url<-createWCS_URLs(type="Pixel")
-  if(is.null(ref_Id))    ref_Id<-coverage_get_coordinate_reference(coverage = coverage)
+  if(is.null(ref_Id))    ref_Id<-coverage_get_coordinate_reference(coverage)
 
   bands_len <- length(bands)
   rasters <- list()
@@ -63,11 +64,8 @@ image_from_coverage <- function(coverage, coord_sys, slice_E, slice_N, date, ref
         ras_aggregate <- aggregate(ras, fact=res_eff, expand = FALSE)
         print(ras_aggregate)
         rasters[[i]] <- ras_aggregate
-
       }
-
     }
-
   }
 
   if(!is.null(filename)){
@@ -75,11 +73,5 @@ image_from_coverage <- function(coverage, coord_sys, slice_E, slice_N, date, ref
     rasters<-stack(rasters)
     writeRaster(rasters,filename)
 
-  }else{
-
-    return(rasters)
-
-  }
-
-
+  }else{return(rasters)}
 }

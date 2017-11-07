@@ -14,7 +14,7 @@ pixel_history(coverage, coord_sys, bands, coords, date = NULL,
 
 \item{bands}{coverage bands to calculate and visualize pixel history [character]}
 
-\item{coords}{coordinates of the location of interest [character]}
+\item{coords}{coordinates of the location of interest in c(Lat,Lon)[character]}
 
 \item{date}{date range in format (Ymd) [character]}
 
@@ -25,5 +25,5 @@ This URL can be built with the *createWCS_URLs* function}
 This URL can be built with the *createWCS_URLs* function}
 }
 \description{
-Pixel history of "bands" (coverage bands) for a given point determined "coords"
+Returns a pixel history of one or multiple bands from one coverage.
 }
