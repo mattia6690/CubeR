@@ -1,10 +1,10 @@
-#' @title List Coverages
-#' @description This function Lists all Coverage inluced in the Datacube
+#' @title Returns the Capabilities
+#' @description This function Returns the Capabilities of a DataCube containing all coverages available
 #' @param url This central URL Leads to the 'ows' page of the Datacube
 #' @import xml2
 #' @export
 
-getCoverage <-function(url=NULL){
+getCapability <-function(url=NULL){
 
   if(is.null(url)){
     url = "http://10.8.244.147:8080/rasdaman/ows"
@@ -37,10 +37,7 @@ createWCS_URLs<-function(url=NULL,type){
   urlsmall<-paste(urlsmall[1:3],"/",collapse = "") %>% str_replace_all(.," ","")
 
   if(type=="Meta")  url2<-paste0(url,"?SERVICE=WCS&VERSION=2.0.1&REQUEST=DescribeCoverage&COVERAGEID=")
-  if(type=="Pixel") url2<-paste0(url,"?SERVICE=WCS&VERSION=2.0.1&REQUEST=ProcessCoverages&QUERY=")
-  if(type=="Tiff")  url2<-paste0(url,"?&SERVICE=WCS&VERSION=2.0.1&REQUEST=GetCoverage&COVERAGEID=")
-  if(type=="Coords")url2<-paste0(urlsmall,"/def/crs/EPSG/0/")
-  if(type=="Time")  url2<-paste0(urlsmall,"/def/crs/OGC/0/")
+  if(type=="Query") url2<-paste0(url,"?SERVICE=WCS&VERSION=2.0.1&REQUEST=ProcessCoverages&QUERY=")
 
   return(url2)
 }
@@ -75,19 +72,15 @@ coverage_get_coordsys <- function(desc_url = NULL, coverage){
 #' @description Function to extract the EPSG identifier from a WCS WCPS coverage
 #' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character].
 #' This URL can be built with the *createWCS_URLs* funtion
-#' @param coord_url character; Url for retrieving EPSG code [character]
-#' This URL can be built with the *createWCS_URLs* funtion
 #' @param coverage Name of a coverage [character]
 #' @import magrittr
 #' @import xml2
 #' @importFrom stringr str_split
 #' @export
 
-coverage_get_coordinate_reference <- function(desc_url=NULL, coord_url=NULL, coverage){
-
+coverage_get_coordinate_reference <- function(desc_url=NULL, coverage){
 
   if(is.null(desc_url)) desc_url<-createWCS_URLs(type="Meta")
-  if(is.null(desc_url)) coord_url<-createWCS_URLs(type="Coords")
 
   d_xml <- xml2::read_xml(paste0(desc_url,coverage))
 

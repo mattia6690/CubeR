@@ -1,12 +1,15 @@
 #' @title Calculate Pixel Buffer History
 #' @description Calculate pixel buffer history of a coverage band
 #' @param coverage name of the coverage [character]
-#' @param coord_sys coordinate system [character]
 #' @param coords coordinates of the location of interest [character]
 #' @param band coverage band [character]
+#' @param buffer A buffer Zone around the coordinates of the Point [numeric]
 #' @param date date range in format (Ymd) [character]
-#' @param pixel_url Web Coverage Service (WCS) for processing the query [character].
+#' @param filname filename for the NETCDF Output.
+#' If none is provided the Object will be deleted after temporal storage in the tempdir [character]
+#' @param query_url Web Coverage Service (WCS) for processing the query [character].
 #' This URL can be built with the *createWCS_URLs* function
+#' @param plot do you want a generic plot to be returned [boolean]
 #' @import ncdf4
 #' @import urltools
 #' @import httr
@@ -16,10 +19,12 @@
 #' @import graphics
 #' @export
 
-geocoded_pixel_buffer <- function(coverage, coord_sys, coords, band, buffer, date = NULL,
-                                  pixel_url=NULL){
+geocoded_pixel_buffer <- function(coverage, coords, band, buffer, date = NULL,
+                                  filename="request",query_url=NULL,plot=F){
 
-  if(is.null(pixel_url)) pixel_url<-createWCS_URLs(type="Pixel")
+  if(is.null(query_url)) query_url<-createWCS_URLs(type="Query")
+
+  coord_sys<-coverage_get_coordsys(coverage=coverage)
 
   bounding_box <- round(c(as.numeric(coords[1]) - as.numeric(buffer),
                           as.numeric(coords[1]) + as.numeric(buffer),
@@ -46,19 +51,16 @@ geocoded_pixel_buffer <- function(coverage, coord_sys, coords, band, buffer, dat
   }
 
   query_encode  <- urltools::url_encode(query)
-  request       <- paste(pixel_url, query_encode, collapse = NULL, sep="")
-
-  print(request)
+  request       <- paste(query_url, query_encode, collapse = NULL, sep="")
 
   res <- GET(request)
   bin <- content(res, "raw")
 
-  writeBin(bin, paste0("tmp/",res$cookies$value))
 
-  ncdf <- nc_open(paste0("tmp/",res$cookies$value))
+  writeBin(bin, paste0(tempdir(),filename))
+  ncdf <- nc_open(paste0(tempdir(),filename))
 
   dates <- ncvar_get(ncdf, coord_sys[3])
-
   dates <- dates/86400
   dates <- as.Date(dates, origin = "1970-01-01")
 
@@ -68,46 +70,50 @@ geocoded_pixel_buffer <- function(coverage, coord_sys, coords, band, buffer, dat
   chip_center_y <- round(ncdf$dim$N$len/2)
 
   nc_close(ncdf)
+  if(filename!="request") file.remove(paste0(tempdir(),filename))
 
-  file.remove(paste0("tmp/",res$cookies$value))
+  if(plot==TRUE){
 
-  cols <- round(sqrt(length(dates)))
-  rows <- cols + 1
-  par(mar = c(0,1,1,1), oma = c(3,3,1,1))
-  layout(matrix(c(rep(1,rows),c(seq(2,rows*cols+1, by = 1))), nrow = rows, byrow = TRUE))
+    cols <- round(sqrt(length(dates)))
+    rows <- cols + 1
+    par(mar = c(0,1,1,1), oma = c(3,3,1,1))
+    layout(matrix(c(rep(1,rows),c(seq(2,rows*cols+1, by = 1))), nrow = rows, byrow = TRUE))
 
-  start_date <- floor_date(dates[1], unit = "month")
-  end_date <- ceiling_date(dates[length(dates)], unit = "month")
+    start_date <- floor_date(dates[1], unit = "month")
+    end_date <- ceiling_date(dates[length(dates)], unit = "month")
 
-  max <- range(values[, chip_center_x, chip_center_y])[2] %>% as.character() %>% nchar()
+    max <- range(values[, chip_center_x, chip_center_y])[2] %>% as.character() %>% nchar()
 
-  y_low <- 0
-  y_up <- round(range(values[, chip_center_x, chip_center_y])[2], -max+1)
+    y_low <- 0
+    y_up <- round(range(values[, chip_center_x, chip_center_y])[2], -max+1)
 
-  p <- plot(dates, values[, chip_center_x, chip_center_y], type = "l", lwd = 2, axes = FALSE)
+    p <- plot(dates, values[, chip_center_x, chip_center_y], type = "l", lwd = 2, axes = FALSE)
 
-  axis(side = 3, at = seq(start_date, end_date, by= "month"), labels = seq(start_date, end_date, by= "month"),
-       cex.axis = 0.8, padj = 1)
-  axis(side = 2, at = seq(y_low,y_up, by = y_up/5), labels = seq(y_low,y_up, by = y_up/5))
+    axis(side = 3, at = seq(start_date, end_date, by= "month"), labels = seq(start_date, end_date, by= "month"),
+         cex.axis = 0.8, padj = 1)
+    axis(side = 2, at = seq(y_low,y_up, by = y_up/5), labels = seq(y_low,y_up, by = y_up/5))
 
-  par(pty = "s")
+    par(pty = "s")
 
-  for(j in 1:length(dates)){
-    image(values[j,,], col = gray.colors(10), axes = F, pty = "s")
-    title(main = dates[j], cex.main = 0.8)
+    for(j in 1:length(dates)){
+      image(values[j,,], col = gray.colors(10), axes = F, pty = "s")
+      title(main = dates[j], cex.main = 0.8)
 
-    if(is.element(j, seq(1,rows*cols,by = rows))){
-      axis(side = 2, at = c(par("usr")[3],par("usr")[2]), labels = c(bounding_box[3],bounding_box[4]),
-           las = 1, hadj = 1, padj = 0, cex.axis = 0.8)
+      if(is.element(j, seq(1,rows*cols,by = rows))){
+        axis(side = 2, at = c(par("usr")[3],par("usr")[2]), labels = c(bounding_box[3],bounding_box[4]),
+             las = 1, hadj = 1, padj = 0, cex.axis = 0.8)
 
+      }
+
+      if (is.element(j+rows, seq(rows^2-rows+1,rows^2,by = 1))){
+        axis(side = 1, at = c(par("usr")[1],par("usr")[4]), labels = c(bounding_box[1],bounding_box[2]),
+             las = 2, padj = 0, hadj = 1, cex.axis = 0.8)
+      }
     }
 
-    if (is.element(j+rows, seq(rows^2-rows+1,rows^2,by = 1))){
-      axis(side = 1, at = c(par("usr")[1],par("usr")[4]), labels = c(bounding_box[1],bounding_box[2]),
-           las = 2, padj = 0, hadj = 1, cex.axis = 0.8)
-    }
-  }
+    return(p)
 
-  return(p)
+  }else return(list(Request=request,BB=bounding_box,TimeStamps=dates,Values=values))
+
 
 }

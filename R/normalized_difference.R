@@ -1,174 +1,157 @@
 #' @title Calculate Normalized Difference Pixel History
 #' @description Calculate normalized difference pixel history between band1 and band2
 #' @param coverage name of the coverage [character]
-#' @param coord_sys coordinate system [character]
 #' @param coords coordinates of the location of interest [character]
 #' @param band1 coverage band [character]
 #' @param band2 coverage band [character]
 #' @param date date range in format (Ymd) [character]
 #' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character].
 #' This URL can be built with the *createWCS_URLs* function
-#' @param pixel_url Web Coverage Service (WCS) for processing the query [character].
+#' @param query_url Web Coverage Service (WCS) for processing the query [character].
 #' This URL can be built with the *createWCS_URLs* function
 #' @param plot handler if a plot is returned or a vector containing timestamp and value
 #' @import magrittr
 #' @import urltools
 #' @import httr
 #' @import stringr
+#' @import ggplot2
+#' @importFrom dplyr distinct
 #' @export
 
-norm_diff_hist <- function(coverage, coord_sys, coords, band1, band2, date = NULL,
-                           desc_url=NULL,pixel_url=NULL, plot = TRUE){
+norm_diff_pixel <- function(coverage, coords, band1, band2, date = NULL,
+                           desc_url=NULL, query_url=NULL, plot = TRUE){
 
   if(is.null(desc_url)) desc_url<-createWCS_URLs(type="Meta")
-  if(is.null(pixel_url)) pixel_url<-createWCS_URLs(type="Pixel")
-  if(is.null(band1) | is.null(band2)){
+  if(is.null(query_url)) query_url<-createWCS_URLs(type="Query")
 
-    p <- plot(1, type = "n", axes = FALSE, xlab = "", ylab = "")
-    p <- text(1,1, "Can't calculate normalized difference for selected coverage, reason: No band selected!", cex = 2)
+  coord_sys<-coverage_get_coordsys(coverage=coverage)
 
-  } else {
+  if(is.null(band1) | is.null(band2)) stop("Can't calculate normalized difference for selected coverage, reason: No band selected!")
 
-    times<-coverage_get_timestamps(desc_url,coverage)
+  times<-coverage_get_timestamps(desc_url,coverage)
 
-    if(is.null(date)){
+  csys1<-paste0(coord_sys[1],'(',round(coords[1]),')')
+  csys2<-paste0(coord_sys[2],'(',round(coords[2]),')')
 
-      times <- times %>% as.Date()
+  if(is.null(date))   date2<-c(min(times),max(times))
+  if(length(date)==1) date2<-rep(date,2)
+  if(length(date)>1)  date2<-c(min(date),max(date))
 
-      query <- paste0('for c in (', coverage, ') return encode (',
-                      '( (int) c.',
-                      band1,'[', coord_sys[1],'(',coords[1],'),',coord_sys[2], '(',coords[2],')]', '- c.',
-                      band2,'[', coord_sys[1],'(',coords[1],'),',coord_sys[2], '(',coords[2],')])','/',
-                      '( (int) c.',
-                      band1,'[', coord_sys[1],'(',coords[1],'),',coord_sys[2], '(',coords[2],')]', '+ c.',
-                      band2,'[', coord_sys[1],'(',coords[1],'),',coord_sys[2], '(',coords[2],')]', '),',
-                      '"csv"',')')
-    } else {
+  csys3<-paste0(coord_sys[3],'("',date2[1],'":"', date2[2],'")',sep="")
+  paster<-paste(csys1,csys2,csys3,sep=",")
+  paster<-paste0('[',paster,']')
 
-      times <- times[times >= date[1] & times <= date[2]] %>% as.Date()
+  query <- paste0('for c in (', coverage, ') return encode((',
+                  '( (int) c.',band1, paster,
+                  '-',
+                  'c.',band2, paster,')',
+                  '/',
+                  '( (int) c.',band1, paster,
+                  '+',
+                  'c.', band2, paster, ')),'
+                  ,'"text/csv")')
 
-      query <- paste0('for c in (', coverage, ') return encode (( (int) c.',band1,'[', coord_sys[1],'(',coords[1],'),',coord_sys[2],
-                      '(',coords[2],'),', coord_sys[3], '("',date[1],'":"', date[2],'")',']', '- c.',band2,'[', coord_sys[1],'(',coords[1],'),',coord_sys[2],
-                      '(',coords[2],'),', coord_sys[3], '("',date[1],'":"', date[2],'")',']',')','/', '( (int) c.',band1,'[', coord_sys[1],'(',coords[1],'),',coord_sys[2],
-                      '(',coords[2],'),', coord_sys[3], '("',date[1],'":"', date[2],'")',']', '+', 'c.',band2,'[', coord_sys[1],'(',coords[1],'),',coord_sys[2],
-                      '(',coords[2],'),', coord_sys[3], '("',date[1],'":"', date[2],'")',']', '),', '"csv"',')')
+  query_encode  <- urltools::url_encode(query)
+  request       <- paste(query_url, query_encode, collapse = NULL, sep="")
 
-    }
+  res <- GET(request)
+  bin <- suppressMessages(
+    content(res,"text") %>%
+    str_replace_all(.,"\\{","") %>%
+    str_replace_all(.,"\\}","") %>%
+    str_split(.,",") %>% unlist() %>%
+    as.numeric())
 
-
-    query_encode  <- urltools::url_encode(query)
-    request       <- paste(pixel_url, query_encode, collapse = NULL, sep="")
-
-    print(request)
-
-    res <- GET(request)
-    bin <- content(res,"text") %>%
-      str_replace_all(.,"\\{","") %>%
-      str_replace_all(.,"\\}","") %>%
-      str_split(.,",") %>% unlist() %>%
-      as.numeric()
-
-    res <- bin
-
-    out <- cbind(times, res)
-  }
+  res <- bin
+  out <- cbind.data.frame(times, res)
+  out <- dplyr::distinct(out)
 
   if(plot == TRUE){
-    p<-plot(times,res,type="o", lwd = 2, xlab="Date", ylab="Normalized difference", ylim = c(-1,1), cex.axis = 1.2, cex.lab = 1.2)
-    p <-legend("topright", inset = .02,legend=paste0(band1," - ",band2), pch=15)
-    p<-title(paste0("Normalized Difference between ", band1, " and ", band2))
+
+    p<-ggplot(out,aes(as.Date(times),res))+geom_point()+geom_line()+
+      ggtitle(paste("Normalized Difference of", band1, ",", band2,". Coverage:",coverage))+
+      ylab("Normalized Difference")+ xlab("Date")
 
     return(p)
 
-  } else {
-
-    return(out)
-
-  }
-
-
-
+  } else return(out)
 }
 
 #' @title Calculate Normalized Difference Raster Layer
 #' @description Calculate a raster layer of normalized difference between band_1 and band_2
 #' @param coverage name of the coverage [character]
-#' @param coord_sys coordinate system [character]
 #' @param slice_E image slicing coordinates in x-direction [character]
 #' @param slice_N image slicing coordinates in y-direction [character]
 #' @param date an available timestamp [character]
-#' @param ref_Id EPSG code of the coordinate system [character]
+#' @param band1 coverage band [character]
+#' @param band2 coverage band [character]
 #' @param res_eff factor to scale raster resolution [numeric]
 #' @param format image format in WCPS query [character]
-#' @param band_1 coverage band [character]
-#' @param band_2 coverage band [character]
+#' @param query_url Web Coverage Service (WCS) for processing the query [character].
+#' This URL can be built with the *createWCS_URLs* function
 #' @import urltools
 #' @import httr
 #' @import raster
 #' @import sp
 #' @export
 
-norm_diff_raster <- function(coverage, coord_sys, slice_E, slice_N, date, ref_Id, res_eff, format,
-                             band_1, band_2, pixel_url = NULL){
+norm_diff_raster <- function(coverage, slice_E, slice_N, date, band1, band2,
+                             res_eff=1, format="TIFF", query_url = NULL){
 
-  if(is.null(pixel_url)) pixel_url<-createWCS_URLs(type="Pixel")
+  if(is.null(query_url)) query_url<-createWCS_URLs(type="Query")
 
-  query = paste0('for c in (', coverage, ') ', 'return encode ((unsigned char)(127.5*(1+( (int) ',
-                 'c.',band_1,'[',
+  if(length(date)>1) stop("No multiple dates supported")
+
+  coord_sys <-coverage_get_coordsys(coverage=coverage)
+  ref_Id    <-coverage_get_coordinate_reference(coverage=coverage)
+
+  query<- paste0('for c in (', coverage, ') ', 'return encode ((unsigned char)(127.5*(1+( (int) ',
+                 'c.',band1,'[',
                  coord_sys[1],'(',slice_E[1], ':',slice_E[2], '),',
                  coord_sys[2],'(',slice_N[1], ':',slice_N[2], '),',
                  coord_sys[3],'("',date,'")]',
                  '-',
-                 'c.',band_2,'[',
+                 'c.',band2,'[',
                  coord_sys[1],'(',slice_E[1], ':',slice_E[2], '),',
                  coord_sys[2],'(',slice_N[1], ':',slice_N[2], '),',
                  coord_sys[3],'("',date,'")]',
                  ')/( (int) ',
-                 'c.',band_1,'[',
+                 'c.',band1,'[',
                  coord_sys[1],'(',slice_E[1], ':',slice_E[2], '),',
                  coord_sys[2],'(',slice_N[1], ':',slice_N[2], '),',
                  coord_sys[3],'("',date,'")]',
                  '+',
-                 'c.',band_2,'[',
+                 'c.',band2,'[',
                  coord_sys[1],'(',slice_E[1], ':',slice_E[2], '),',
                  coord_sys[2],'(',slice_N[1], ':',slice_N[2], '),',
                  coord_sys[3],'("',date,'")]',
-                 '))),', '"', format, '")')
+                 '))),', '"image/',tolower(format),'")')
+
 
   query_encode  <- urltools::url_encode(query)
-  request       <- paste(pixel_url, query_encode, collapse = NULL, sep="")
-
-  print(request)
+  request       <- paste(query_url, query_encode, collapse = NULL, sep="")
 
   res <- GET(request)
   bin <- content(res, "raw")
 
   to_img <- get(paste0("read",toupper(format)))
-
-  img <- to_img(bin)
-  img <- (img*2) - 1
+  img <- suppressWarnings(to_img(bin))
 
   ras_ext <- extent(c(as.numeric(slice_E), as.numeric(slice_N)))
-
-  ras = raster(img)
+  ras <- raster(img)
 
   proj4string(ras) <- CRS(paste0("+init=epsg:",ref_Id))
   extent(ras) <- ras_ext
 
   if(res_eff == 1){
 
-    print(ras)
     return(ras)
 
   } else {
 
     ras_aggregate <- aggregate(ras, fact=res_eff, expand = FALSE)
-
-    print(ras_aggregate)
-
     return(ras_aggregate)
 
   }
-
 }
 
