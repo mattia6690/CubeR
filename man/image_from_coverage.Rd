@@ -4,14 +4,11 @@
 \alias{image_from_coverage}
 \title{Get a raster from coverage}
 \usage{
-image_from_coverage(coverage, coord_sys, slice_E, slice_N, date,
-  ref_Id = NULL, res_eff = NULL, format = "TIFF", bands = NULL,
-  pixel_url = NULL, filename = NULL)
+image_from_coverage(coverage, slice_E, slice_N, date, res_eff = 1,
+  format = "TIFF", bands = NULL, filename = NULL, query_url = NULL)
 }
 \arguments{
 \item{coverage}{name of the coverage [character]}
-
-\item{coord_sys}{coordinate system [character]}
 
 \item{slice_E}{image slicing coordinates in x-direction [character]}
 
@@ -19,17 +16,16 @@ image_from_coverage(coverage, coord_sys, slice_E, slice_N, date,
 
 \item{date}{an available timestamp [character]}
 
-\item{ref_Id}{EPSG code of the coordinate system [character]}
-
 \item{res_eff}{factor to scale raster resolution [numeric]}
 
 \item{format}{image format in WCPS query [character]}
 
 \item{bands}{coverage bands to calculate raster. Can contain one or more bands from the same coverage [character]}
 
-\item{pixel_url}{Web Coverage Service (WCS) for processing the query. This URL can be built with the *createWCS_URLs* function. [character]}
-
 \item{filename}{If the raster image should be saved please digit a path and a filename. [character]}
+
+\item{query_url}{Web Coverage Service (WCS) for processing the query.
+This URL can be built with the *createWCS_URLs* function. [character]}
 }
 \description{
 This function provides the possibility to interact directly with the data cubes. It gives the option to write the images to

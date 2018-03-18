@@ -5,7 +5,7 @@
 \title{Pixel History}
 \usage{
 pixel_history(coverage, coord_sys, bands, coords, date = NULL,
-  desc_url = NULL, pixel_url = NULL)
+  desc_url = NULL, query_url = NULL, plot = F)
 }
 \arguments{
 \item{coverage}{name of the coverage [character]}
@@ -21,7 +21,7 @@ pixel_history(coverage, coord_sys, bands, coords, date = NULL,
 \item{desc_url}{Web Coverage Service (WCS) DescribeCoverage url [character].
 This URL can be built with the *createWCS_URLs* function}
 
-\item{pixel_url}{Web Coverage Service (WCS) for processing the query [character].
+\item{query_url}{Web Coverage Service (WCS) for processing the query [character].
 This URL can be built with the *createWCS_URLs* function}
 }
 \description{

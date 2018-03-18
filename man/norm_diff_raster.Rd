@@ -4,13 +4,11 @@
 \alias{norm_diff_raster}
 \title{Calculate Normalized Difference Raster Layer}
 \usage{
-norm_diff_raster(coverage, coord_sys, slice_E, slice_N, date, ref_Id, res_eff,
-  format, band_1, band_2, pixel_url = NULL)
+norm_diff_raster(coverage, slice_E, slice_N, date, band1, band2, res_eff = 1,
+  format = "TIFF", query_url = NULL)
 }
 \arguments{
 \item{coverage}{name of the coverage [character]}
-
-\item{coord_sys}{coordinate system [character]}
 
 \item{slice_E}{image slicing coordinates in x-direction [character]}
 
@@ -18,15 +16,16 @@ norm_diff_raster(coverage, coord_sys, slice_E, slice_N, date, ref_Id, res_eff,
 
 \item{date}{an available timestamp [character]}
 
-\item{ref_Id}{EPSG code of the coordinate system [character]}
+\item{band1}{coverage band [character]}
+
+\item{band2}{coverage band [character]}
 
 \item{res_eff}{factor to scale raster resolution [numeric]}
 
 \item{format}{image format in WCPS query [character]}
 
-\item{band_1}{coverage band [character]}
-
-\item{band_2}{coverage band [character]}
+\item{query_url}{Web Coverage Service (WCS) for processing the query [character].
+This URL can be built with the *createWCS_URLs* function}
 }
 \description{
 Calculate a raster layer of normalized difference between band_1 and band_2

@@ -4,22 +4,27 @@
 \alias{geocoded_pixel_buffer}
 \title{Calculate Pixel Buffer History}
 \usage{
-geocoded_pixel_buffer(coverage, coord_sys, coords, band, buffer, date = NULL,
-  pixel_url = NULL)
+geocoded_pixel_buffer(coverage, coords, band, buffer, date = NULL,
+  filename = "request", query_url = NULL, plot = F)
 }
 \arguments{
 \item{coverage}{name of the coverage [character]}
-
-\item{coord_sys}{coordinate system [character]}
 
 \item{coords}{coordinates of the location of interest [character]}
 
 \item{band}{coverage band [character]}
 
+\item{buffer}{A buffer Zone around the coordinates of the Point [numeric]}
+
 \item{date}{date range in format (Ymd) [character]}
 
-\item{pixel_url}{Web Coverage Service (WCS) for processing the query [character].
+\item{query_url}{Web Coverage Service (WCS) for processing the query [character].
 This URL can be built with the *createWCS_URLs* function}
+
+\item{plot}{do you want a generic plot to be returned [boolean]}
+
+\item{filname}{filename for the NETCDF Output.
+If none is provided the Object will be deleted after temporal storage in the tempdir [character]}
 }
 \description{
 Calculate pixel buffer history of a coverage band
