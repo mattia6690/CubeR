@@ -5,7 +5,7 @@ library(git2r)
 library(getPass)
 
 #uname<- "Your GITLAB username"
-uname <- "Daniel.Frisinghelli"
+uname <- "Mattia.Rossi"
 
 devtools::install_git("https://gitlab.inf.unibz.it/REMSEN/CubeR",
                       credentials = git2r::cred_user_pass(uname, getPass::getPass()))

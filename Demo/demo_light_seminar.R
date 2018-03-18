@@ -5,7 +5,7 @@ library(git2r)
 library(getPass)
 
 #uname<- "Your GITLAB username"
-uname <- "Daniel.Frisinghelli"
+uname <- "Mattia.Rossi"
 
 devtools::install_git("https://gitlab.inf.unibz.it/REMSEN/CubeR",
                       credentials = git2r::cred_user_pass(uname, getPass::getPass()))
@@ -15,16 +15,14 @@ library(CubeR) # OPEN PACKAGE IN PACKAGES
 ##################################################
 
 
-
-
 #### USECASE: CONNECT TO SERVICE #################
 
 # Get capabilities: List all coverages on the server
-capabs <- getCoverage()
+capabs <- getCapability()
 print(capabs)
 
 # Select a coverage
-coverage <- capabs[7]
+coverage <- capabs[length(capabs)]
 print(coverage)
 
 ##################################################
@@ -84,11 +82,11 @@ NDVI_colormap <- colorRampPalette(c("blue","cadetblue","azure","grey","brown","y
 
 ### Example 1: pixel history ###
 x11(12,8, xpos = - 400, ypos = 100)
-pxl_hst_1 <- pixel_history(coverage, coord_sys, bands[2], coords, date = NULL)
+pxl_hst_1 <- pixel_history(coverage, coord_sys, bands[3], coords, date = NULL,plot=F)
 
 # Multiple bands possible
 x11(12,8, xpos = - 400, ypos = 100)
-pxl_hst_5 <- pixel_history(coverage, coord_sys, bands[2:7], coords, date = NULL)
+pxl_hst_5 <- pixel_history(coverage, coord_sys, bands[2:7], coords, date = NULL,plot=T)
 
 
 
@@ -99,12 +97,12 @@ Red <- bands[4]
 
 # History of NDVI in this case
 x11(12,8, xpos = - 400, ypos = 100)
-norm_dff_hist <- norm_diff_hist(coverage, coord_sys, coords, NIR, Red, date = NULL)
+norm_dff_hist <- norm_diff_pixel(coverage, coord_sys, coords, band1=Red, band2=NIR, date = NULL)
 
 
 
 ### Example 3: get an image ###
-img <- image_from_coverage(coverage, coord_sys, slice_E, slice_N, date, EPSG_id, res_eff = 1, format = "tiff",
+img <- image_from_coverage(coverage, slice_E, slice_N, date, res_eff = 1, format = "tiff",
                            bands = bands[8])
 
 lflt <- leaflet() %>% addTiles() %>% addRasterImage(img[[1]], colors = gray.colors(10))
@@ -142,6 +140,9 @@ tstmp <- as.Date(tstmp_value[,1], origin = "1970-01-01")
 value <- tstmp_value[,2]
 
 # In-situ timeseries
+#devtools::install_git("https://gitlab.inf.unibz.it/earth_observation_public/MonalisR")
+
+
 devtools::install_git("https://gitlab.inf.unibz.it/REMSEN/MonalisR",
                       credentials = git2r::cred_user_pass(uname, getPass::getPass()))
 library(MonalisR)
