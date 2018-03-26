@@ -1,26 +1,17 @@
 # CubeR
 ## An R-package to access data cubes via WCS and WCPS queries.
 
-
-#### Download the Package from Gitlab
-
-For now this Package is in a develpment stage and therefore privatly hosted in a Gitlab repository. It is available only to registered group members and the access has to be granted by one of the active members of the group (see [Members Section](https://gitlab.inf.unibz.it/REMSEN/CubeR/project_members) or below)
-A general way to load the package in R is provided with the following code:<br>
+This R- Package prvides several functions for interacting with databases WCS/WCPS based on OGC standards. We use the [Rasdaman implementation](http://saocompute.eurac.edu/rasdaman/ows) in order to host Sentinel Data in Data Cubes as used for the [Sentinel Alpine Observatory](http://sao.eurac.edu/)) .
+The package can be directly imported in R by typing:
 
 ```r
 library(devtools)
-library(git2r)
-library(getPass)
-
-uname<- "Your GITLAB username"
-
-devtools::install_git("https://gitlab.inf.unibz.it/REMSEN/CubeR", 
-  credentials = git2r::cred_user_pass(uname, getPass::getPass())
-)
+devtools::install_git("https://gitlab.inf.unibz.it/earth_observation_public/CubeR")
 
 ```
 
-PLEASE NOTE: You need to have an udpated Gitlab Password to access the repository. IF you sign in via the scientific web,your password IS NOT considered as a valid GITLAB account
+In the following subchapters I would like to give a brief overview on how the package works in general. If you need more information feel free to contact me or consult the two HTML Files in the [Documentary](https://gitlab.inf.unibz.it/earth_observation_public/CubeR/tree/master/Documentation) Directory
+
 
 #### Contributors
 
