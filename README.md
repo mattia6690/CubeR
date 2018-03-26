@@ -1,7 +1,7 @@
 # CubeR
 ## An R-package to access data cubes via WCS and WCPS queries.
 
-This R- Package prvides several functions for interacting with databases WCS/WCPS based on OGC standards. We use the [Rasdaman implementation](http://saocompute.eurac.edu/rasdaman/ows) in order to host Sentinel Data in Data Cubes as used for the [Sentinel Alpine Observatory](http://sao.eurac.edu/)) .
+This R- Package provides several functions for interacting with databases WCS/WCPS based on OGC standards. We use the [Rasdaman implementation](http://saocompute.eurac.edu/rasdaman/ows) in order to host Sentinel Data in Data Cubes as used for the [Sentinel Alpine Observatory](http://sao.eurac.edu/) .
 The package can be directly imported in R by typing:
 
 ```r
@@ -10,16 +10,31 @@ devtools::install_git("https://gitlab.inf.unibz.it/earth_observation_public/Cube
 
 ```
 
-In the following subchapters I would like to give a brief overview on how the package works in general. If you need more information feel free to contact me or consult the two HTML Files in the [Documentary](https://gitlab.inf.unibz.it/earth_observation_public/CubeR/tree/master/Documentation) Directory
+This package offers several possibilities to interact with Data Cubes s listed below. If you need more information feel free to contact us or consult the two HTML Files located in the [Documentary](https://gitlab.inf.unibz.it/earth_observation_public/CubeR/tree/master/Documentation) Directory
+
+#### 1. Discovery
+
+It is possible to discover the Capabilities (all Data ) as well as the Coverages (Data Cubes) in the Rasdaman Environment by calling the **getCapabilities** functionality followed by the respecive URLs. The function automatically calls and parses the XML response from the server and collects the data necessary to describe the datasets desirec 
+
+#### 2. Describe
+
+All the Data returned by the server is accessable with the functions beginning with **coverage_get**. These are explicitly for retrieving metadata corresponding to each of the coverages.
+
+#### 3. Request/Return
+
+Each function has an automatic query handler translating the input in WCPS queries and hands them over to the Rasdaman Server. Additionally all of these functions are functional for subsetting the Data Cube in two to three dimensions (x-y-z).
+The Functions **image_from_covrage** returns either an image or a subset of an image. The **pixel_history** function returns the time series for one Pixel and the *geocoded_pixel_buffer** function for a specific area surrounding the Pixel. 
+
+#### 4 Processing
+
+The WCPS expansion allows the DAta Cube to become not ony a data provider but also a poverful tool for direct computation on the fly. The queries can be expanded by mathematical operator to perform operation between multiple spatial subsets. We implemented a functionality to calculate the NDVI (Normalized Difference Vegetation Index) directly on the Cube.
+The **norm_diff_raster** function is calculating on a raster or a subset of a raster at one given time and returns a TIFF raster. The **norm_diff_pixel** returns the calculated NDVI from one or multiple pixel over time as a Data Frame
 
 
-#### Contributors
+### Contributors
 
-* [Mattia Rossi] (https://gitlab.inf.unibz.it/Mattia.Rossi)
-* [Daniel Frisinghelli] (https://gitlab.inf.unibz.it/Daniel.Frisinghelli)<br>
+* [Mattia Rossi](https://gitlab.inf.unibz.it/Mattia.Rossi) (*mattia.rossi@eurac.edu*)
+* [Daniel Frisinghelli](https://gitlab.inf.unibz.it/Daniel.Frisinghelli)<br>
 
 <br>![](http://www.eurac.edu/Style%20Library/logoEURAC.jpg)<br><br>
 
-#### Contact
-
-For further information please contact *mattia.rossi@eurac.edu* or *daniel.frisinghelli@eurac.edu*
