@@ -1,10 +1,10 @@
 Package: CubeR
 Type: Package
 Title: R-package to access data cubes via WCS and WCPS queries.
-Version: 0.1.0
+Version: 1.0.0
 Author: Frisinghelli, D., Rossi, M.
 Maintainer: Mattia Rossi <mattia.rossi@eurac.edu>
-Description: This package provides core function to access data cubes dor geospatial timeseries with WCS and WCPS queries
+Description: This package provides core functionalities to access data cubes or geospatial timeseries with WCS and WCPS queries
 License: MIT License 2017
 Encoding: UTF-8
 LazyData: true
