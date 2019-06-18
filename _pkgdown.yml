@@ -4,9 +4,9 @@ development:
 home:
   links:
   - text: Browse source code
-    href: http://github.com/mattia6690/Mfunctions
+    href: http://github.com/mattia6690/CubeR
   - text: Comments and Issues are welcomed
-    href: https://github.com/mattia6690/Mfunctions/issues
+    href: https://github.com/mattia6690/CubeR/issues
 
 navbar:
   title: "CubeR"
