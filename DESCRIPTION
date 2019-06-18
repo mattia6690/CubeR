@@ -1,22 +1,30 @@
-Package: CubeR
 Type: Package
-Title: R-package to access data cubes via WCS and WCPS queries.
-Version: 1.0.0
-Author: Frisinghelli, D., Rossi, M.
-Maintainer: Mattia Rossi <mattia.rossi@eurac.edu>
-Description: This package provides core functionalities to access data cubes or geospatial timeseries with WCS and WCPS queries. This Packages is tested with the Rasdaman Implementation of EURAC Research (http://saocompute.eurac.edu/rasdaman/ows)
-License: MIT License 2017
-Encoding: UTF-8
-LazyData: true
-RoxygenNote: 6.0.1
+Package: CubeR
+Title: R-package to access Rasdaman data cubes via WCS and WCPS queries
+Version: 0.1.1
+Authors@R: c(
+  person("Mattia", "Rossi", email="mattia.rossi@eurac.edu", role=c("aut", "cre")),
+  person("Daniel", "Frisinghelli", role="aut"))
+Description: This package provides core functionalities 
+  to access data cubes or geospatial timeseries with WCS and WCPS queries. 
+  This Packages is tested with the Rasdaman Implementation of EURAC Research.
+License: MIT + file LICENSE
 Imports:
+  magrittr,
   httr,
   lubridate,
-  magrittr,
   ncdf4,
-  raster,
   sp,
   stringr,
   urltools,
-  xml2
-
+  xml2,
+  raster,
+  ggplot2,
+  dplyr,
+  graphics,
+  tiff,
+  png,
+  jpeg
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.1.1
