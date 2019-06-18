@@ -1,7 +1,7 @@
 #' @title Returns the Capabilities
 #' @description This function Returns the Capabilities of a DataCube containing all coverages available
 #' @param url This central URL Leads to the 'ows' page of the Datacube
-#' @import xml2
+#' @importFrom xml2 read_xml xml_text xml_find_all
 #' @export
 
 getCapability <-function(url=NULL){
@@ -23,15 +23,12 @@ getCapability <-function(url=NULL){
 #' @param url This central URL Leads to the 'ows' page of the Datacube. If empy the Standard Rasdaman page is used.
 #' @param type characer; Mandatory input for the URL that should be created with the function.
 #' For now the types "Meta", "Pixel","Tiff","Coords","Time" can be created.
-#' @import xml2
 #' @importFrom stringr str_split str_replace_all
 #' @export
 
 createWCS_URLs<-function(url=NULL,type){
 
-  if(is.null(url)){
-    url = "http://10.8.244.147:8080/rasdaman/ows"
-  }
+  if(is.null(url))url = "http://10.8.244.147:8080/rasdaman/ows"
 
   urlsmall<-str_split(url,"/")[[1]]
   urlsmall<-paste(urlsmall[1:3],"/",collapse = "") %>% str_replace_all(.," ","")
@@ -47,8 +44,9 @@ createWCS_URLs<-function(url=NULL,type){
 #' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character].
 #' This URL can be built with the *createWCS_URLs* funtion
 #' @param coverage Name of a coverage [character]
-#' @import magrittr
-#' @import xml2
+#' @importFrom magrittr "%>%"
+#' @importFrom xml2 read_xml xml_find_all xml_children xml_text
+#' @importFrom stringr str_split
 #' @export
 
 coverage_get_coordsys <- function(desc_url = NULL, coverage){
@@ -73,8 +71,8 @@ coverage_get_coordsys <- function(desc_url = NULL, coverage){
 #' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character].
 #' This URL can be built with the *createWCS_URLs* funtion
 #' @param coverage Name of a coverage [character]
-#' @import magrittr
 #' @import xml2
+#' @importFrom magrittr "%>%"
 #' @importFrom stringr str_split
 #' @export
 
@@ -108,8 +106,8 @@ coverage_get_coordinate_reference <- function(desc_url=NULL, coverage){
 #' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character]
 #' This URL can be built with the *createWCS_URLs* funtion
 #' @param coverage Name of a coverage [character]
-#' @import magrittr
 #' @import xml2
+#' @importFrom magrittr "%>%"
 #' @importFrom stringr str_split str_replace_all
 #' @export
 
@@ -136,8 +134,8 @@ coverage_get_temporal_extent <- function(desc_url=NULL, coverage){
 #' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character]
 #' This URL can be built with the *createWCS_URLs* funtion
 #' @param coverage Name of a coverage [character]
-#' @import magrittr
 #' @import xml2
+#' @importFrom magrittr "%>%"
 #' @importFrom stringr str_split
 #' @export
 
@@ -167,8 +165,8 @@ coverage_get_bounding_box <- function(desc_url=NULL, coverage){
 #' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character]
 #' This URL can be built with the *createWCS_URLs* funtion
 #' @param coverage Name of a coverage [character]
-#' @import magrittr
 #' @import xml2
+#' @importFrom magrittr "%>%"
 #' @importFrom stringr str_split
 #' @export
 
@@ -176,10 +174,10 @@ coverage_get_timestamps <- function(desc_url=NULL, coverage){
 
   if(is.null(desc_url)) desc_url<-createWCS_URLs(type="Meta")
 
-  i_xml = xml2::read_xml(paste0(desc_url,coverage))
+  i_xml <- read_xml(paste0(desc_url,coverage))
 
-  av_img_times = xml2::xml_find_all(i_xml, ".//wcs:CoverageDescription") %>%
-    xml_children(.) %>% .[5] %>%
+  av_img_times <- xml_find_all(i_xml, ".//wcs:CoverageDescription") %>%
+    xml2::xml_children(.) %>% .[5] %>%
     xml_children(.) %>% xml_children(.) %>% .[6] %>%
     xml_children(.) %>% xml_children(.) %>% .[2] %>%
     xml_text(.) %>% str_replace_all(., "\"", "") %>%
@@ -194,17 +192,17 @@ coverage_get_timestamps <- function(desc_url=NULL, coverage){
 #' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character]
 #' This URL can be built with the *createWCS_URLs* funtion
 #' @param coverage Name of a coverage [character]
-#' @import magrittr
 #' @import xml2
+#' @importFrom magrittr "%>%"
 #' @export
 
 coverage_get_bands <- function(desc_url=NULL, coverage){
 
   if(is.null(desc_url)) desc_url<-createWCS_URLs(type="Meta")
 
-  b_xml = xml2::read_xml(paste0(desc_url,coverage))
+  b_xml<- read_xml(paste0(desc_url,coverage))
 
-  bands = xml2::xml_find_all(b_xml, ".//wcs:CoverageDescription") %>%
+  bands<- xml_find_all(b_xml, ".//wcs:CoverageDescription") %>%
     xml_children(.) %>% .[6] %>%
     xml_children() %>%
     xml_find_all(.,"./swe:field") %>% xml_attr(.,"name")
@@ -218,8 +216,8 @@ coverage_get_bands <- function(desc_url=NULL, coverage){
 #' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character]
 #' This URL can be built with the *createWCS_URLs* funtion
 #' @param coverage Name of a coverage [character]
-#' @import magrittr
 #' @import xml2
+#' @importFrom magrittr "%>%"
 #' @importFrom stringr str_split
 #' @export
 

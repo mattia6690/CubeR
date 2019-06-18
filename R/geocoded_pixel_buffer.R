@@ -5,18 +5,19 @@
 #' @param band coverage band [character]
 #' @param buffer A buffer Zone around the coordinates of the Point [numeric]
 #' @param date date range in format (Ymd) [character]
-#' @param filname filename for the NETCDF Output.
+#' @param filename filename for the NETCDF Output.
 #' If none is provided the Object will be deleted after temporal storage in the tempdir [character]
 #' @param query_url Web Coverage Service (WCS) for processing the query [character].
 #' This URL can be built with the *createWCS_URLs* function
 #' @param plot do you want a generic plot to be returned [boolean]
 #' @import ncdf4
-#' @import urltools
 #' @import httr
 #' @import stringr
-#' @import lubridate
-#' @import magrittr
 #' @import graphics
+#' @importFrom lubridate floor_date ceiling_date
+#' @importFrom magrittr "%>%"
+#' @importFrom urltools url_encode
+#' @importFrom grDevices gray.colors
 #' @export
 
 geocoded_pixel_buffer <- function(coverage, coords, band, buffer, date = NULL,
@@ -56,7 +57,6 @@ geocoded_pixel_buffer <- function(coverage, coords, band, buffer, date = NULL,
   res <- GET(request)
   bin <- content(res, "raw")
 
-
   writeBin(bin, paste0(tempdir(),filename))
   ncdf <- nc_open(paste0(tempdir(),filename))
 
@@ -74,27 +74,35 @@ geocoded_pixel_buffer <- function(coverage, coords, band, buffer, date = NULL,
 
   if(plot==TRUE){
 
+    # Setup Plot
     cols <- round(sqrt(length(dates)))
     rows <- cols + 1
     par(mar = c(0,1,1,1), oma = c(3,3,1,1))
     layout(matrix(c(rep(1,rows),c(seq(2,rows*cols+1, by = 1))), nrow = rows, byrow = TRUE))
 
+    # Define Parameters
     start_date <- floor_date(dates[1], unit = "month")
     end_date <- ceiling_date(dates[length(dates)], unit = "month")
 
     max <- range(values[, chip_center_x, chip_center_y])[2] %>% as.character() %>% nchar()
 
     y_low <- 0
-    y_up <- round(range(values[, chip_center_x, chip_center_y])[2], -max+1)
+    y_up  <- round(range(values[, chip_center_x, chip_center_y])[2], -max+1)
 
+    # Draw the Plot
     p <- plot(dates, values[, chip_center_x, chip_center_y], type = "l", lwd = 2, axes = FALSE)
-
-    axis(side = 3, at = seq(start_date, end_date, by= "month"), labels = seq(start_date, end_date, by= "month"),
-         cex.axis = 0.8, padj = 1)
-    axis(side = 2, at = seq(y_low,y_up, by = y_up/5), labels = seq(y_low,y_up, by = y_up/5))
+    axis(side = 3,
+         at = seq(start_date, end_date, by= "month"),
+         labels = seq(start_date, end_date, by= "month"),
+         cex.axis = 0.8,
+         padj = 1)
+    axis(side = 2,
+         at = seq(y_low,y_up, by = y_up/5),
+         labels = seq(y_low,y_up, by = y_up/5))
 
     par(pty = "s")
 
+    # Add to Plot
     for(j in 1:length(dates)){
       image(values[j,,], col = gray.colors(10), axes = F, pty = "s")
       title(main = dates[j], cex.main = 0.8)
@@ -114,6 +122,4 @@ geocoded_pixel_buffer <- function(coverage, coords, band, buffer, date = NULL,
     return(p)
 
   }else return(list(Request=request,BB=bounding_box,TimeStamps=dates,Values=values))
-
-
 }

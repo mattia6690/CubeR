@@ -9,10 +9,12 @@
 #' This URL can be built with the *createWCS_URLs* function
 #' @param query_url Web Coverage Service (WCS) for processing the query [character].
 #' This URL can be built with the *createWCS_URLs* function
-#' @import magrittr
+#' @param plot Should the data be plotted [boolean].
 #' @import httr
+#' @importFrom magrittr "%>%"
 #' @importFrom stringr str_replace_all str_split
 #' @importFrom urltools url_encode
+#' @importFrom grDevices rainbow
 #' @export
 
 pixel_history <- function(coverage, coord_sys, bands, coords, date = NULL,

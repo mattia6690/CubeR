@@ -11,13 +11,13 @@
 #' @param filename If the raster image should be saved please digit a path and a filename. [character]
 #' @param query_url Web Coverage Service (WCS) for processing the query.
 #' This URL can be built with the *createWCS_URLs* function. [character]
-#' @importFrom urltools url_encode
 #' @import httr
-#' @import raster
 #' @import tiff
 #' @import png
 #' @import jpeg
-#' @import sp
+#' @importFrom raster raster extent aggregate stack writeRaster
+#' @importFrom sp CRS
+#' @importFrom urltools url_encode
 #' @export
 image_from_coverage <- function(coverage, slice_E, slice_N, date,
                                 res_eff=1, format="TIFF", bands=NULL,filename=NULL,
@@ -50,7 +50,7 @@ image_from_coverage <- function(coverage, slice_E, slice_N, date,
     img     <- suppressWarnings(to_img(bin, as.is = T))
 
     ras_ext <- extent(c(as.numeric(slice_E), as.numeric(slice_N)))
-    ras     <-raster(img)
+    ras     <- raster(img)
     proj4string(ras) <- CRS(paste0("+init=epsg:",ref_Id))
     extent(ras)      <- ras_ext
 

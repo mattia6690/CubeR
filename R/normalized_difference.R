@@ -10,11 +10,11 @@
 #' @param query_url Web Coverage Service (WCS) for processing the query [character].
 #' This URL can be built with the *createWCS_URLs* function
 #' @param plot handler if a plot is returned or a vector containing timestamp and value
-#' @import magrittr
-#' @import urltools
 #' @import httr
 #' @import stringr
 #' @import ggplot2
+#' @importFrom urltools url_encode
+#' @importFrom magrittr "%>%"
 #' @importFrom dplyr distinct
 #' @export
 
@@ -89,10 +89,10 @@ norm_diff_pixel <- function(coverage, coords, band1, band2, date = NULL,
 #' @param format image format in WCPS query [character]
 #' @param query_url Web Coverage Service (WCS) for processing the query [character].
 #' This URL can be built with the *createWCS_URLs* function
-#' @import urltools
 #' @import httr
 #' @import raster
 #' @import sp
+#' @importFrom urltools url_encode
 #' @export
 
 norm_diff_raster <- function(coverage, slice_E, slice_N, date, band1, band2,
