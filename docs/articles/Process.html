@@ -30,7 +30,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">CubeR</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="Unreleased version">1.0.1</span>
+        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="Unreleased version">0.1.1</span>
       </span>
     </div>
 
@@ -41,9 +41,6 @@
     <span class="fa fa-home fa-lg"></span>
      
   </a>
-</li>
-<li>
-  <a href="../reference/index.html">Functions</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -59,6 +56,9 @@
       <a href="../articles/Process.html">Process Data</a>
     </li>
   </ul>
+</li>
+<li>
+  <a href="../reference/index.html">Functions</a>
 </li>
 <li>
   <a href="../articles/changelog.html">Changelog</a>
@@ -154,14 +154,14 @@
 <a class="sourceLine" id="cb7-12" data-line-number="12">nd1.tiff &lt;-<span class="st"> </span><span class="kw"><a href="../reference/norm_diff_raster.html">norm_diff_raster</a></span>(coverage, slice_E, slice_N, <span class="dt">date=</span>date, <span class="dt">band1=</span>NIR, <span class="dt">band2=</span>Red)</a>
 <a class="sourceLine" id="cb7-13" data-line-number="13"></a>
 <a class="sourceLine" id="cb7-14" data-line-number="14">nd1.tiff</a></code></pre></div>
-<pre><code>## class       : RasterLayer 
-## dimensions  : 1001, 1001, 1002001  (nrow, ncol, ncell)
-## resolution  : 9.99001, 9.99001  (x, y)
-## extent      : 615812, 625812, 5166499, 5176499  (xmin, xmax, ymin, ymax)
-## coord. ref. : +init=epsg:32632 +proj=utm +zone=32 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0 
-## data source : in memory
-## names       : layer 
-## values      : 0.4352941, 0.8980392  (min, max)</code></pre>
+<pre><code>## class      : RasterLayer 
+## dimensions : 1001, 1001, 1002001  (nrow, ncol, ncell)
+## resolution : 9.99001, 9.99001  (x, y)
+## extent     : 615812, 625812, 5166499, 5176499  (xmin, xmax, ymin, ymax)
+## crs        : +init=epsg:32632 +proj=utm +zone=32 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0 
+## source     : memory
+## names      : layer 
+## values     : 0.4352941, 0.8980392  (min, max)</code></pre>
 <p>In the last examples we combined the functionality of NDVI computation provided by this package with an in-situ database implemented at EURAC. This so called <a href="monalisasos.eurac.edu/sos/index">MONALISA Database</a> holds NDVI measurements in 15-minute temporal resolution and can be accessed with a second <a href="https://gitlab.inf.unibz.it/earth_observation_public/MonalisR">R-package</a> developed at EURAC Research.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="co"># Download Sentinel Data</span></a>
 <a class="sourceLine" id="cb9-2" data-line-number="2">coverage&lt;-<span class="kw"><a href="../reference/getCapability.html">getCapability</a></span>()[<span class="dv">11</span>] <span class="co"># S2 10m Reflectance</span></a>
