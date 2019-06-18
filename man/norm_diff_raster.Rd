@@ -4,8 +4,8 @@
 \alias{norm_diff_raster}
 \title{Calculate Normalized Difference Raster Layer}
 \usage{
-norm_diff_raster(coverage, slice_E, slice_N, date, band1, band2, res_eff = 1,
-  format = "TIFF", query_url = NULL)
+norm_diff_raster(coverage, slice_E, slice_N, date, band1, band2,
+  res_eff = 1, format = "TIFF", query_url = NULL)
 }
 \arguments{
 \item{coverage}{name of the coverage [character]}

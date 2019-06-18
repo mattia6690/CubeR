@@ -23,6 +23,8 @@ This URL can be built with the *createWCS_URLs* function}
 
 \item{query_url}{Web Coverage Service (WCS) for processing the query [character].
 This URL can be built with the *createWCS_URLs* function}
+
+\item{plot}{Should the data be plotted [boolean].}
 }
 \description{
 Returns a pixel history of one or multiple bands from one coverage.

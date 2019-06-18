@@ -18,13 +18,13 @@ geocoded_pixel_buffer(coverage, coords, band, buffer, date = NULL,
 
 \item{date}{date range in format (Ymd) [character]}
 
+\item{filename}{filename for the NETCDF Output.
+If none is provided the Object will be deleted after temporal storage in the tempdir [character]}
+
 \item{query_url}{Web Coverage Service (WCS) for processing the query [character].
 This URL can be built with the *createWCS_URLs* function}
 
 \item{plot}{do you want a generic plot to be returned [boolean]}
-
-\item{filname}{filename for the NETCDF Output.
-If none is provided the Object will be deleted after temporal storage in the tempdir [character]}
 }
 \description{
 Calculate pixel buffer history of a coverage band
