@@ -1,0 +1,32 @@
+development:
+  mode: unreleased
+
+home:
+  links:
+  - text: Browse source code
+    href: http://github.com/mattia6690/Mfunctions
+  - text: Comments and Issues are welcomed
+    href: https://github.com/mattia6690/Mfunctions/issues
+
+navbar:
+  title: "CubeR"
+  type: inverse
+  left:
+    - icon: fa-home fa-lg
+      href: index.html
+    - text: "Tutorial"
+      menu:
+      - text: "Get Data"
+        href: articles/Get.html
+      - text: "Process Data"
+        href: articles/Process.html
+    - text: "Functions"
+      href: reference/index.html
+    - text: "Changelog"
+      href: articles/changelog.html
+
+  right:
+    - icon: fa-twitter fa-lg
+      href: http://www.twitter.com/mattia6690
+    - icon: fa-github fa-lg
+      href: http://www.github.com/mattia6690
