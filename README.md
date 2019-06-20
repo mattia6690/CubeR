@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/mattia6690/ARTMO_R.svg?branch=master)](https://travis-ci.org/mattia6690/ARTMO_R) 
-[![CRAN](http://www.r-pkg.org/badges/version/ARTMOR)](https://cran.r-project.org/package=ARTMOR)
+[![Build Status](https://travis-ci.org/mattia6690/CubeR.svg?branch=master)](https://travis-ci.org/mattia6690/Cube_R) 
+[![CRAN](http://www.r-pkg.org/badges/version/CubeR)](https://cran.r-project.org/package=CubeR)
 
 # CubeR
 ## An R-package to access data cubes via WCS and WCPS queries.
