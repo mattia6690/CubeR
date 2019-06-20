@@ -98,14 +98,14 @@
 <div id="an-r-package-to-access-data-cubes-via-wcs-and-wcps-queries-" class="section level2">
 <h2 class="hasAnchor">
 <a href="#an-r-package-to-access-data-cubes-via-wcs-and-wcps-queries-" class="anchor"></a>An R-package to access data cubes via WCS and WCPS queries.</h2>
-<p>This R-Package provides several functions for interacting with databases WCS/WCPS based on OGC standards. We use the <a href="http://saocompute.eurac.edu/rasdaman/ows">Rasdaman implementation</a> in order to host Sentinel Data in Data Cubes as used for the <a href="http://sao.eurac.edu/">Sentinel Alpine Observatory</a> . The package can be directly imported in R by typing:</p>
+<p>This R-Package provides several functions for interacting with databases WCS/WCPS based on OGC standards. We use the <a href="http://saocompute.eurac.edu/rasdaman/ows">Rasdaman implementation</a> in order to host Copernicus Sentinel Data in multidimensionla arrays (Data Cubes) as used for the <a href="http://sao.eurac.edu/">Sentinel Alpine Observatory</a> The package can be directly imported in R by typing:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(devtools)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2">devtools<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/devtools/topics/reexports">install_git</a></span>(<span class="st">"https://gitlab.inf.unibz.it/earth_observation_public/CubeR"</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb1-2" data-line-number="2">devtools<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/devtools/topics/reexports">install_github</a></span>(<span class="st">"mattia6690/CubeR"</span>)</a></code></pre></div>
 <p>This package offers several possibilities to interact with Data Cubes as listed below. If you need more information feel free to contact us or consult the two HTML Files located in the <a href="https://gitlab.inf.unibz.it/earth_observation_public/CubeR/tree/master/Documentation">Documentary</a> directory</p>
 <div id="discovery" class="section level4">
 <h4 class="hasAnchor">
 <a href="#discovery" class="anchor"></a>1. Discovery</h4>
-<p>It is possible to discover the Capabilities (all Data) as well as the Coverages (Data Cubes) in the Rasdaman environment by calling the <strong>getCapabilities</strong> functionality followed by the respecive URLs. The function automatically calls and parses the XML response from the server and collects the data necessary to describe the datasets desired.</p>
+<p>It is possible to discover the whole Rasdaman environment (Capabilities) as well as the Coverages (Data Cubes) by calling the <code>getCapailities</code> functionality followed by the respecive URLs. The function automatically calls and parses the XML response from the server and collects the data necessary to describe the datasets desired.</p>
 </div>
 <div id="describe" class="section level4">
 <h4 class="hasAnchor">
@@ -125,14 +125,8 @@
 <div id="contributors" class="section level3">
 <h3 class="hasAnchor">
 <a href="#contributors" class="anchor"></a>Contributors</h3>
-<ul>
-<li>
-<a href="https://gitlab.inf.unibz.it/Mattia.Rossi">Mattia Rossi</a> (<em><a href="mailto:mattia.rossi@eurac.edu">mattia.rossi@eurac.edu</a></em>)</li>
-<li>
-<a href="https://gitlab.inf.unibz.it/Daniel.Frisinghelli">Daniel Frisinghelli</a><br>
-</li>
-</ul>
-<p><br><img src="http://www.eurac.edu/Style%20Library/logoEURAC.jpg"><br><br></p>
+<p><a href="https://github.com/mattia6690">Mattia Rossi</a> <br><a href="https://gitlab.inf.unibz.it/Daniel.Frisinghelli">Daniel Frisinghelli</a> <br><br></p>
+<p><img src="http://www.eurac.edu/Style%20Library/logoEURAC.jpg"></p>
 </div>
 </div>
 </div>
