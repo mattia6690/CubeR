@@ -16,7 +16,3 @@ apt_packages:
   - libhdf5-serial-dev
   - libnetcdf-dev
   - netcdf-bin
-
-
-script:
-  - R CMD install --configure-args="--with-nc-config=/home/travis/bin/nc-config" ncdf4
