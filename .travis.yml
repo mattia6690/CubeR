@@ -17,4 +17,4 @@ before install:
   - sudo add-apt-repository -y ppa:opencpu/jq --yes
   - sudo apt-get -qq update
   - sudo apt-get install -y libgdal-dev libproj-dev libprotobuf-dev libudunits2-dev netcdf-bin
-  - R CMD INSTALL --configure-args="--with-nc-config=/home/travis/bin/nc-config" ncdf4
+  - sudo R CMD INSTALL --configure-args="--with-nc-config=/home/travis/bin/nc-config" ncdf4
