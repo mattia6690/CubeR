@@ -12,7 +12,6 @@ apt_packages:
   - libgdal-dev
   - libproj-dev
   - libudunits2-dev
-  - libnetcdf-dev
 
 before install:
   - sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable --yes
