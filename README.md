@@ -4,6 +4,8 @@
 # CubeR
 ## An R-package to access data cubes via WCS and WCPS queries.
 
+**dev branch**
+
 This R-Package provides several functions for interacting with databases WCS/WCPS based on OGC standards. We use the [Rasdaman implementation](http://saocompute.eurac.edu/rasdaman/ows) in order to host Copernicus Sentinel Data in multidimensionla arrays (Data Cubes) as used for the [Sentinel Alpine Observatory](http://sao.eurac.edu/)
 The package can be directly imported in R by typing:
 
