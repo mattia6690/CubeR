@@ -9,7 +9,6 @@ rgb2luminance <- function(img){
 
   # Compute luminance from RGB using matrix multiplication
   gray<- img[,,1]*0.299 + img[,,2]*0.587 + img[,,3]*0.114
-
   return(gray)
 
 }

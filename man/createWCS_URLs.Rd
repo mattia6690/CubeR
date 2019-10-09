@@ -4,13 +4,13 @@
 \alias{createWCS_URLs}
 \title{WCS URL creator}
 \usage{
-createWCS_URLs(url = NULL, type)
+createWCS_URLs(type, url = NULL)
 }
 \arguments{
-\item{url}{This central URL Leads to the 'ows' page of the Datacube. If empy the Standard Rasdaman page is used.}
+\item{type}{character; Mandatory input for the URL that should be created with the function.
+For now the types "Meta", "Query","Capabilities" can be created.}
 
-\item{type}{characer; Mandatory input for the URL that should be created with the function.
-For now the types "Meta", "Pixel","Tiff","Coords","Time" can be created.}
+\item{url}{character; Web Coverage Service (WCS) Url. If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")}
 }
 \description{
 This function provides the possibility to construct the url necessary to address different layers of

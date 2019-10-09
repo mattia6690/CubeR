@@ -1,28 +1,24 @@
 #' @title Calculate Normalized Difference Pixel History
 #' @description Calculate normalized difference pixel history between band1 and band2
-#' @param coverage name of the coverage [character]
-#' @param coords coordinates of the location of interest [character]
-#' @param band1 coverage band [character]
-#' @param band2 coverage band [character]
-#' @param date date range in format (Ymd) [character]
-#' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character].
-#' This URL can be built with the *createWCS_URLs* function
-#' @param query_url Web Coverage Service (WCS) for processing the query [character].
-#' This URL can be built with the *createWCS_URLs* function
-#' @param plot handler if a plot is returned or a vector containing timestamp and value
-#' @import httr
-#' @import stringr
-#' @import ggplot2
+#' @param coverage character; name of the coverage
+#' @param coords character; coordinates of the location of interest
+#' @param band1 character; coverage band
+#' @param band2 character; coverage band
+#' @param date character; date range in format (Ymd)
+#' @param url character; Web Coverage Service (WCS) Url. If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")
+#' @param format character; Output format. Not all available are implemented for each datacube. Please see `getFormat` for all the available formats
+#' @importFrom httr GET content
+#' @importFrom stringr str_replace_all
 #' @importFrom urltools url_encode
 #' @importFrom magrittr "%>%"
 #' @importFrom dplyr distinct
 #' @export
 
 norm_diff_pixel <- function(coverage, coords, band1, band2, date = NULL,
-                           desc_url=NULL, query_url=NULL, plot = TRUE){
+                           url=NULL,format="text/csv"){
 
-  if(is.null(desc_url)) desc_url<-createWCS_URLs(type="Meta")
-  if(is.null(query_url)) query_url<-createWCS_URLs(type="Query")
+  desc_url <-createWCS_URLs(type="Meta",url=url)
+  query_url<-createWCS_URLs(type="Query",url=url)
 
   coord_sys<-coverage_get_coordsys(coverage=coverage)
 
@@ -37,7 +33,7 @@ norm_diff_pixel <- function(coverage, coords, band1, band2, date = NULL,
   if(length(date)==1) date2<-rep(date,2)
   if(length(date)>1)  date2<-c(min(date),max(date))
 
-  csys3<-paste0(coord_sys[3],'("',date2[1],'":"', date2[2],'")',sep="")
+  csys3 <-paste0(coord_sys[3],'("',date2[1],'":"', date2[2],'")',sep="")
   paster<-paste(csys1,csys2,csys3,sep=",")
   paster<-paste0('[',paster,']')
 
@@ -49,7 +45,7 @@ norm_diff_pixel <- function(coverage, coords, band1, band2, date = NULL,
                   '( (int) c.',band1, paster,
                   '+',
                   'c.', band2, paster, ')),'
-                  ,'"text/csv")')
+                  ,'"',format,'")')
 
   query_encode  <- urltools::url_encode(query)
   request       <- paste(query_url, query_encode, collapse = NULL, sep="")
@@ -59,46 +55,36 @@ norm_diff_pixel <- function(coverage, coords, band1, band2, date = NULL,
     content(res,"text") %>%
     str_replace_all(.,"\\{","") %>%
     str_replace_all(.,"\\}","") %>%
-    str_split(.,",") %>% unlist() %>%
+    strsplit(.,",") %>% unlist() %>%
     as.numeric())
 
   res <- bin
   out <- cbind.data.frame(times, res)
   out <- dplyr::distinct(out)
+  return(out)
 
-  if(plot == TRUE){
-
-    p<-ggplot(out,aes(as.Date(times),res))+geom_point()+geom_line()+
-      ggtitle(paste("Normalized Difference of", band1, ",", band2,". Coverage:",coverage))+
-      ylab("Normalized Difference")+ xlab("Date")
-
-    return(p)
-
-  } else return(out)
 }
 
 #' @title Calculate Normalized Difference Raster Layer
 #' @description Calculate a raster layer of normalized difference between band_1 and band_2
-#' @param coverage name of the coverage [character]
-#' @param slice_E image slicing coordinates in x-direction [character]
-#' @param slice_N image slicing coordinates in y-direction [character]
-#' @param date an available timestamp [character]
-#' @param band1 coverage band [character]
-#' @param band2 coverage band [character]
-#' @param res_eff factor to scale raster resolution [numeric]
-#' @param format image format in WCPS query [character]
-#' @param query_url Web Coverage Service (WCS) for processing the query [character].
-#' This URL can be built with the *createWCS_URLs* function
-#' @import httr
-#' @import raster
-#' @import sp
+#' @param coverage character; name of the coverage
+#' @param slice_E character; image slicing coordinates in x-direction
+#' @param slice_N character; image slicing coordinates in y-direction
+#' @param date character; an available timestamp
+#' @param band1 character; coverage band
+#' @param band2 character; coverage band
+#' @param res_eff numeric; factor to scale raster resolution
+#' @param format character; Output format. Not all available are implemented for each datacube. Please see `getFormat` for all the available formats
+#' @param url character; Web Coverage Service (WCS) Url. If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")
+#' @importFrom httr GET content
+#' @importFrom raster raster extent aggregate
 #' @importFrom urltools url_encode
 #' @export
 
 norm_diff_raster <- function(coverage, slice_E, slice_N, date, band1, band2,
-                             res_eff=1, format="TIFF", query_url = NULL){
+                             res_eff=1,format="image/tiff", url = NULL){
 
-  if(is.null(query_url)) query_url<-createWCS_URLs(type="Query")
+  query_url<-createWCS_URLs(type="Query",url=url)
 
   if(length(date)>1) stop("No multiple dates supported")
 
@@ -125,7 +111,7 @@ norm_diff_raster <- function(coverage, slice_E, slice_N, date, band1, band2,
                  coord_sys[1],'(',slice_E[1], ':',slice_E[2], '),',
                  coord_sys[2],'(',slice_N[1], ':',slice_N[2], '),',
                  coord_sys[3],'("',date,'")]',
-                 '))),', '"image/',tolower(format),'")')
+                 '))),"',format,'")')
 
 
   query_encode  <- urltools::url_encode(query)
@@ -134,13 +120,13 @@ norm_diff_raster <- function(coverage, slice_E, slice_N, date, band1, band2,
   res <- GET(request)
   bin <- content(res, "raw")
 
+  format2<- strsplit(format,"/")[[1]][2]
   to_img <- get(paste0("read",toupper(format)))
-  img <- suppressWarnings(to_img(bin))
+  img    <- suppressWarnings(to_img(bin))
 
   ras_ext <- extent(c(as.numeric(slice_E), as.numeric(slice_N)))
-  ras <- raster(img)
-
-  proj4string(ras) <- CRS(paste0("+init=epsg:",ref_Id))
+  ras     <- raster(img)
+  proj4string(ras) <- paste0("+init=epsg:",ref_Id)
   extent(ras) <- ras_ext
 
   if(res_eff == 1){

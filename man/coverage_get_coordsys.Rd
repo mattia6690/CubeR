@@ -4,13 +4,12 @@
 \alias{coverage_get_coordsys}
 \title{Get coordinate system}
 \usage{
-coverage_get_coordsys(desc_url = NULL, coverage)
+coverage_get_coordsys(coverage, url = NULL)
 }
 \arguments{
-\item{desc_url}{Web Coverage Service (WCS) DescribeCoverage url [character].
-This URL can be built with the *createWCS_URLs* funtion}
+\item{coverage}{character; Name of a coverage}
 
-\item{coverage}{Name of a coverage [character]}
+\item{url}{character; Web Coverage Service (WCS) Url. If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")}
 }
 \description{
 Get the coordinate system of a coverage

@@ -1,18 +1,15 @@
 #' @title Calculate Pixel Buffer History
-#' @description Calculate pixel buffer history of a coverage band
-#' @param coverage name of the coverage [character]
-#' @param coords coordinates of the location of interest [character]
-#' @param band coverage band [character]
-#' @param buffer A buffer Zone around the coordinates of the Point [numeric]
-#' @param date date range in format (Ymd) [character]
-#' @param filename filename for the NETCDF Output.
-#' If none is provided the Object will be deleted after temporal storage in the tempdir [character]
-#' @param query_url Web Coverage Service (WCS) for processing the query [character].
-#' This URL can be built with the *createWCS_URLs* function
-#' @param plot do you want a generic plot to be returned [boolean]
-#' @import ncdf4
-#' @import httr
-#' @import stringr
+#' @description Calculate pixel buffer history of a coverage band. This functionality is limited to Netcdf files
+#' @param coverage character; name of the coverage
+#' @param coords character; coordinates of the location of interest
+#' @param band character; coverage band
+#' @param buffer numeric; A buffer Zone around the coordinates of the Poi
+#' @param date character; date range in format (Ymd)
+#' @param filename character; filename for the NETCDF Output. If none is provided the Object will be deleted after temporal storage in the tempdir
+#' @param url character; Web Coverage Service (WCS) Url. If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")
+#' @param plot boolean; do you want a generic plot to be returned?
+#' @importFrom ncdf4 nc_open ncvar_get nc_close
+#' @importFrom httr GET content
 #' @import graphics
 #' @importFrom lubridate floor_date ceiling_date
 #' @importFrom magrittr "%>%"
@@ -21,9 +18,9 @@
 #' @export
 
 geocoded_pixel_buffer <- function(coverage, coords, band, buffer, date = NULL,
-                                  filename="request",query_url=NULL,plot=F){
+                                  filename="request",url=NULL,plot=F){
 
-  if(is.null(query_url)) query_url<-createWCS_URLs(type="Query")
+  query_url<-createWCS_URLs(type="Query", url=url)
 
   coord_sys<-coverage_get_coordsys(coverage=coverage)
 

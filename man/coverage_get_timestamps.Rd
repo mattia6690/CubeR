@@ -4,14 +4,18 @@
 \alias{coverage_get_timestamps}
 \title{Get Timestamps}
 \usage{
-coverage_get_timestamps(desc_url = NULL, coverage)
+coverage_get_timestamps(coverage, url = NULL, timetype = FALSE,
+  verbose = FALSE)
 }
 \arguments{
-\item{desc_url}{Web Coverage Service (WCS) DescribeCoverage url [character]
-This URL can be built with the *createWCS_URLs* funtion}
+\item{coverage}{character; Name of a coverage}
 
-\item{coverage}{Name of a coverage [character]}
+\item{url}{character; Web Coverage Service (WCS) Url. If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")}
+
+\item{timetype}{boolean; return the type of storage of time dimension in coverage (regular, irregular, none)?}
+
+\item{verbose}{boolean; Want to return the processed coverage?}
 }
 \description{
-Get the available timestamps of WCS, WCPS coverage
+Get the available timestamps of WCS coverages
 }

@@ -1,16 +1,13 @@
 #' @title Pixel History
 #' @description Returns a pixel history of one or multiple bands from one coverage.
-#' @param coverage name of the coverage [character]
-#' @param coord_sys coordinate system [character]
-#' @param bands coverage bands to calculate and visualize pixel history [character]
-#' @param coords coordinates of the location of interest in c(Lat,Lon)[character]
-#' @param date date range in format (Ymd) [character]
-#' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character].
-#' This URL can be built with the *createWCS_URLs* function
-#' @param query_url Web Coverage Service (WCS) for processing the query [character].
-#' This URL can be built with the *createWCS_URLs* function
-#' @param plot Should the data be plotted [boolean].
-#' @import httr
+#' @param coverage character; name of the coverage
+#' @param coord_sys character; coordinate system
+#' @param bands character; coverage bands to calculate and visualize pixel history
+#' @param coords character; coordinates of the location of interest in c(Lat,Lon)
+#' @param date character; date range in format (Ymd)
+#' @param url character; Web Coverage Service (WCS) Url. If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")
+#' @param plot boolean; Should the data be plotted
+#' @importFrom httr GET content
 #' @importFrom magrittr "%>%"
 #' @importFrom stringr str_replace_all str_split
 #' @importFrom urltools url_encode
@@ -18,11 +15,11 @@
 #' @export
 
 pixel_history <- function(coverage, coord_sys, bands, coords, date = NULL,
-                          desc_url=NULL,query_url=NULL,plot=F){
+                          url=NULL,plot=F){
 
 
-  if(is.null(desc_url)) desc_url<-createWCS_URLs(type="Meta")
-  if(is.null(query_url)) query_url<-createWCS_URLs(type="Query")
+  desc_url<-createWCS_URLs(type="Meta",url=url)
+  query_url<-createWCS_URLs(type="Query",url=url)
 
   times<-coverage_get_timestamps(desc_url,coverage)
 

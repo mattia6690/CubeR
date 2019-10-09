@@ -5,27 +5,26 @@
 \title{Calculate Normalized Difference Raster Layer}
 \usage{
 norm_diff_raster(coverage, slice_E, slice_N, date, band1, band2,
-  res_eff = 1, format = "TIFF", query_url = NULL)
+  res_eff = 1, format = "image/tiff", url = NULL)
 }
 \arguments{
-\item{coverage}{name of the coverage [character]}
+\item{coverage}{character; name of the coverage}
 
-\item{slice_E}{image slicing coordinates in x-direction [character]}
+\item{slice_E}{character; image slicing coordinates in x-direction}
 
-\item{slice_N}{image slicing coordinates in y-direction [character]}
+\item{slice_N}{character; image slicing coordinates in y-direction}
 
-\item{date}{an available timestamp [character]}
+\item{date}{character; an available timestamp}
 
-\item{band1}{coverage band [character]}
+\item{band1}{character; coverage band}
 
-\item{band2}{coverage band [character]}
+\item{band2}{character; coverage band}
 
-\item{res_eff}{factor to scale raster resolution [numeric]}
+\item{res_eff}{numeric; factor to scale raster resolution}
 
-\item{format}{image format in WCPS query [character]}
+\item{format}{character; Output format. Not all available are implemented for each datacube. Please see `getFormat` for all the available formats}
 
-\item{query_url}{Web Coverage Service (WCS) for processing the query [character].
-This URL can be built with the *createWCS_URLs* function}
+\item{url}{character; Web Coverage Service (WCS) Url. If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")}
 }
 \description{
 Calculate a raster layer of normalized difference between band_1 and band_2

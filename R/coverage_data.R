@@ -7,26 +7,33 @@
 #' @param date an available timestamp [character]
 #' @param res_eff factor to scale raster resolution [numeric]
 #' @param format image format in WCPS query [character]
-#' @param bands coverage bands to calculate raster. Can contain one or more bands from the same coverage [character]
+#' @param bands character; coverage bands to calculate raster. Can contain one or more bands from the same coverage.
+#' If NULL all bands are used
 #' @param filename If the raster image should be saved please digit a path and a filename. [character]
-#' @param query_url Web Coverage Service (WCS) for processing the query.
-#' This URL can be built with the *createWCS_URLs* function. [character]
-#' @import httr
-#' @import tiff
-#' @import png
-#' @import jpeg
+#' @param url Web Coverage Service (WCS) DescribeCoverage url [character].
+#' If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")
+#' @importFrom httr GET content
+#' @importFrom tiff readTIFF
+#' @importFrom png readPNG
+#' @importFrom jpeg readJPEG
 #' @importFrom raster raster extent aggregate stack writeRaster
-#' @importFrom sp CRS
 #' @importFrom urltools url_encode
 #' @export
 image_from_coverage <- function(coverage, slice_E, slice_N, date,
-                                res_eff=1, format="TIFF", bands=NULL,filename=NULL,
-                                query_url=NULL){
+                                res_eff=1, format="image/tiff", bands=NULL,filename=NULL,
+                                url=NULL){
 
-  if(is.null(query_url)) query_url<-createWCS_URLs(type="Query")
+
+
+
+  if(is.null(query_url)) query_url<-createWCS_URLs(url=url,type="Query")
 
   ref_Id<-coverage_get_coordinate_reference(coverage=coverage)
   coord_sys<-coverage_get_coordsys(coverage=coverage)
+
+  gbands<-coverage_get_bands(coverage)
+  if(is.null(bands)) bands<- gbands
+  if(any(!is.element(gbands,bands))) stop("One or more bands you selected are not present in the selected coverage")
 
   bands_len <- length(bands)
   rasters <- list()
@@ -38,20 +45,21 @@ image_from_coverage <- function(coverage, slice_E, slice_N, date,
                     coord_sys[1], '(', slice_E[1], ':', slice_E[2], ')', ',',
                     coord_sys[2], '(', slice_N[1], ':', slice_N[2], ')', ',',
                     coord_sys[3], '("', date, '")',
-                    '],',
-                    '"image/',tolower(format),'"',')')
+                    '],"',format,'"',')')
 
     query_encode  <- urltools::url_encode(query)
     request       <- paste(query_url, query_encode, collapse = NULL, sep="")
 
-    res <- GET(request)
-    bin <- content(res, "raw")
-    to_img  <- get(paste0("read",toupper(format)))
-    img     <- suppressWarnings(to_img(bin, as.is = T))
+    res     <- GET(request)
+    bin     <- content(res, "raw")
+
+    format2<-strsplit(format,"/")[[1]][2]
+    to_img  <- get(paste0("read",toupper(format2)))
+    img     <- tryCatch({to_img(bin)},error=function(e){message("This format cannot be read by the function")})
 
     ras_ext <- extent(c(as.numeric(slice_E), as.numeric(slice_N)))
     ras     <- raster(img)
-    proj4string(ras) <- CRS(paste0("+init=epsg:",ref_Id))
+    proj4string(ras) <- paste0("+init=epsg:",ref_Id)
     extent(ras)      <- ras_ext
 
     if(res_eff == 1){

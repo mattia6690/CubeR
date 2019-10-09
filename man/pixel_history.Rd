@@ -5,26 +5,22 @@
 \title{Pixel History}
 \usage{
 pixel_history(coverage, coord_sys, bands, coords, date = NULL,
-  desc_url = NULL, query_url = NULL, plot = F)
+  url = NULL, plot = F)
 }
 \arguments{
-\item{coverage}{name of the coverage [character]}
+\item{coverage}{character; name of the coverage}
 
-\item{coord_sys}{coordinate system [character]}
+\item{coord_sys}{character; coordinate system}
 
-\item{bands}{coverage bands to calculate and visualize pixel history [character]}
+\item{bands}{character; coverage bands to calculate and visualize pixel history}
 
-\item{coords}{coordinates of the location of interest in c(Lat,Lon)[character]}
+\item{coords}{character; coordinates of the location of interest in c(Lat,Lon)}
 
-\item{date}{date range in format (Ymd) [character]}
+\item{date}{character; date range in format (Ymd)}
 
-\item{desc_url}{Web Coverage Service (WCS) DescribeCoverage url [character].
-This URL can be built with the *createWCS_URLs* function}
+\item{url}{character; Web Coverage Service (WCS) Url. If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")}
 
-\item{query_url}{Web Coverage Service (WCS) for processing the query [character].
-This URL can be built with the *createWCS_URLs* function}
-
-\item{plot}{Should the data be plotted [boolean].}
+\item{plot}{boolean; Should the data be plotted}
 }
 \description{
 Returns a pixel history of one or multiple bands from one coverage.

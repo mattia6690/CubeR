@@ -1,239 +1,400 @@
-#' @title Returns the Capabilities
-#' @description This function Returns the Capabilities of a DataCube containing all coverages available
-#' @param url This central URL Leads to the 'ows' page of the Datacube
-#' @importFrom xml2 read_xml xml_text xml_find_all
-#' @export
-
-getCapability <-function(url=NULL){
-
-  if(is.null(url)){
-    url = "http://10.8.244.147:8080/rasdaman/ows"
-  }
-
-  urlp<-paste0(url,"?SERVICE=WCS&VERSION=2.0.1&REQUEST=GetCapabilities")
-  xml_cov1 <- xml2::read_xml(urlp)
-  xml_cov1 <- xml_text(xml2::xml_find_all(xml_cov1, ".//wcs:CoverageId"))
-
-  return(xml_cov1)
-}
-
 #' @title WCS URL creator
 #' @description This function provides the possibility to construct the url necessary to address different layers of
 #' Metadata. Every Metadata Information in  the WCS OGS format has to be addressed with a differen URL Query.
-#' @param url This central URL Leads to the 'ows' page of the Datacube. If empy the Standard Rasdaman page is used.
-#' @param type characer; Mandatory input for the URL that should be created with the function.
-#' For now the types "Meta", "Pixel","Tiff","Coords","Time" can be created.
-#' @importFrom stringr str_split str_replace_all
+#' @param type character; Mandatory input for the URL that should be created with the function.
+#' For now the types "Meta", "Query","Capabilities" can be created.
+#' @param url character; Web Coverage Service (WCS) Url. If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")
 #' @export
 
-createWCS_URLs<-function(url=NULL,type){
+createWCS_URLs<-function(type, url = NULL){
 
-  if(is.null(url))url = "http://10.8.244.147:8080/rasdaman/ows"
+  if(is.null(url)) url = "http://saocompute.eurac.edu/rasdaman/ows"
 
-  urlsmall<-str_split(url,"/")[[1]]
-  urlsmall<-paste(urlsmall[1:3],"/",collapse = "") %>% str_replace_all(.," ","")
+  urlsmall<-strsplit(url,"/")[[1]]
+  urlsmall<-paste0(urlsmall[1:3],"/",collapse = "")
 
   if(type=="Meta")  url2<-paste0(url,"?SERVICE=WCS&VERSION=2.0.1&REQUEST=DescribeCoverage&COVERAGEID=")
   if(type=="Query") url2<-paste0(url,"?SERVICE=WCS&VERSION=2.0.1&REQUEST=ProcessCoverages&QUERY=")
+  if(type=="Capability")  url2<-paste0(url,"?SERVICE=WCS&VERSION=2.0.1&REQUEST=GetCapabilities")
 
   return(url2)
+
 }
+
+#' @title Returns the Service Provider of the Rasdaman Environment
+#' @description This function returns the contact information to the Rasdaman service provider
+#' @param url character; Web Coverage Service (WCS) Url. If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")
+#' @importFrom XML xmlParse xmlToList
+#' @importFrom dplyr filter
+#' @importFrom tibble enframe
+#' @export
+getProvider <- function(url=NULL){
+
+  urlp<- createWCS_URLs(type="Capability",url=url)
+  str<- "ServiceProvider."
+  xml_cov1 <- xmlParse(urlp)
+  xml_cov2 <- enframe(unlist(xmlToList(xml_cov1)))
+  xml_cov3 <- filter(xml_cov2,grepl(str,name))
+  xml_cov3$name<-str_replace(xml_cov3$name,str,"")
+
+  return(xml_cov3)
+
+}
+
+#' @title Returns the Capabilities
+#' @description This function Returns the Capabilities of a DataCube containing all coverages available
+#' @param url character; Web Coverage Service (WCS) Url. If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")
+#' @importFrom XML xmlParse xmlToList
+#' @importFrom dplyr filter
+#' @importFrom tibble enframe
+#' @export
+getCapabilities <-function(url=NULL){
+
+  urlp     <- createWCS_URLs(type="Capability",url=url)
+  xml_cov1 <- xmlParse(urlp)
+  xml_cov2 <- enframe(unlist(xmlToList(xml_cov1)))
+  xml_cov3 <- filter(xml_cov2,grepl("CoverageId",name))[["value"]]
+
+  return(xml_cov3)
+
+}
+
+
+#' @title Rasdaman support formats
+#' @description This function returns the formats supported by the Rasdaman Version
+#' @param url character; Web Coverage Service (WCS) Url. If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")
+#' @importFrom XML xmlParse xmlToList
+#' @importFrom dplyr filter
+#' @importFrom tibble enframe
+#' @export
+getFormats <- function(url=NULL){
+
+  urlp<- createWCS_URLs(type="Capability",url=url)
+  xml_cov1 <- xmlParse(urlp)
+  xml_cov2 <- enframe(unlist(xmlToList(xml_cov1)))
+  xml_cov3 <- filter(xml_cov2,grepl("ServiceMetadata.",name))[["value"]]
+
+  return(xml_cov3)
+
+}
+
+
+#' @title Set possible coverage Metadata axis names
+#' @description Scrape the data in the whole Rasdaman Environment
+#' @param addcols Add dimension columns and the respective name. If NULL the standard SAO columns are used
+#' @param keepsao boolean; You want to keep the ones from SAO adjacent to the ones you defined?
+#' @importFrom tibble as_tibble
+#' @export
+setMetaCols<-function(addcols=NULL,keepsao=F){
+
+  if(is.null(addcols)){
+
+    saoTcols<- cbind("Time",c("DATE","Time","ansi","date"))
+    saoXcols<- cbind("X",c("X","Lon","Long","E"))
+    saoYcols<- cbind("Y",c("Y","Lat","N"))
+    bind<-rbind.data.frame(saoTcols,saoXcols,saoYcols)
+    colnames(bind)<-c("Type","Axis")
+
+  }
+
+  if(!is.null(addcols)){
+
+    if(ncol(addcols)!=2) stop("Please provide a matrix with two columns indicating the Type and Axis")
+    if(keepsao==T) {
+      bind<-rbind.data.frame(bind,addcols)
+    } else {bind<-addcols}
+  }
+
+  colnames(bind)<-c("Type","Axis")
+  bind<- as_tibble(bind)
+
+  return(bind)
+}
+
+#' @title Parse coverage metadata
+#' @description This function parses the metadata of a coverage and returns a tibble
+#' containing both values and attributes. Other *coverage_get* functions are built on top of this function
+#' @param coverage character; Name of a coverage
+#' @param returnxml You want the Coverage Metadata XML return?
+#' @param url character; Web Coverage Service (WCS) DescribeCoverage url
+#' If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")
+#' @note used in the getMetadata function
+#' @importFrom XML xmlParse xmlToList
+#' @importFrom tibble as_tibble enframe
+#' @importFrom tidyr separate
+#' @export
+parseMetadata<-function(coverage,returnxml=F,url=NULL){
+
+  desc  <- createWCS_URLs(type="Meta",url=url)
+  xml   <- xmlParse(paste0(desc,coverage))
+
+  if(isTRUE(returnxml)) return(xml)
+
+  enf  <- enframe(unlist(xmlToList(xml,addAttributes = T)))
+  enf2 <- tidyr::separate(enf,name,into=c("Level","Attributes"),sep=".attrs",fill="right")
+
+  max.xml.lng<- lapply(enf2$Level,function(x){length(strsplit(x,"\\.")[[1]])})
+  max.xml.lng<- max(unlist(max.xml.lng))
+
+  lp<-lapply(enf2$Level,function(x,l=max.xml.lng){
+
+    split     <- str_split(x,"\\.")[[1]]
+    split.l   <- length(split)
+    split.diff<- (l-split.l)
+
+    if(split.diff>0) {
+      r<-rep(NA,split.diff)
+      return(c(split,r))
+    } else {return(split)}
+  })
+
+  dc<-do.call(rbind,lp)
+  colnames(dc) <-paste0("L",c(1:ncol(dc)))
+
+  ret<-as_tibble(cbind(dc,Attributes=enf2$Attributes,Value=enf2$value))
+  return(ret)
+
+}
+
+
+#' @title Get coverage metadata
+#' @description This function retieves the actual Metadata from the
+#' containing both values and attributes. Other *coverage_get* functions are built on top of this function
+#' @param coverage character; Name of a coverage
+#' @param Metacols tibble; 2 column tibble with all available columns and their dimension
+#' If NULL the standard SAO columns will be used
+#' @param url character; Web Coverage Service (WCS) Url. If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")
+#' @note used in the getMetadata function
+#' @importFrom dplyr filter left_join
+#' @importFrom tibble as_tibble
+#' @export
+getMetadata <- function(coverage, Metacols=NULL, url=NULL){
+
+  if(is.null(Metacols)) Metacols<- setMetaCols()
+
+  # Get the Axes
+  getMeta <- parseMetadata(coverage,url = url)
+  labels  <- dplyr::filter(getMeta,L4=="axisLabels")[["Value"]]
+  labels  <- strsplit(labels," ")[[1]]
+
+  # Get the bounding Boxes
+  bbox1<- dplyr::filter(getMeta,L2=="boundedBy" & L4=="lowerCorner")[["Value"]]
+  bbox2<- dplyr::filter(getMeta,L2=="boundedBy" & L4=="upperCorner")[["Value"]]
+  lc<-strsplit(bbox1," ")[[1]]
+  uc<-strsplit(bbox2," ")[[1]]
+
+
+  # Return the units
+  units<- dplyr::filter(getMeta,L2=="boundedBy" & Attributes==".uomLabels")[["Value"]]
+  units1 <- strsplit(units," ")[[1]]
+
+  # Return the EPSG code
+  srs<- dplyr::filter(getMeta,L2=="boundedBy" & Attributes==".srsName")[["Value"]]
+  srs.split<-strsplit(srs,"&")[[1]]
+  epsg <- grep(srs.split,pattern = "EPSG",value = T)
+  epsg1<- strsplit(epsg,"/")[[1]]
+  epsg2<- epsg1[length(epsg1)]
+
+  # Return the Offset (resolution)
+  offset1<- dplyr::filter(getMeta,L2=="domainSet" &
+                            (L4=="offsetVector" | L6=="offsetVector" ) &
+                            is.na(Attributes))[["Value"]]
+  offset2<- lapply(offset1,function(x){
+    split<-strsplit(x," ")[[1]]
+    split2<-split[which(split!="0")]
+  })
+  offset3<-unlist(offset2)
+
+  # Bind all of that
+  bind<-cbind.data.frame(coverage,labels,lc,uc,offset3,units1,epsg2)
+  colnames(bind)<- c("Coverage","Axis","Start","End","Resolution","Units","EPSG")
+  bind<-as_tibble(bind)
+  bind2<-suppressWarnings(dplyr::left_join(bind,Metacols,by="Axis"))
+  return(bind2)
+
+}
+
 
 #' @title Get coordinate system
 #' @description Get the coordinate system of a coverage
-#' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character].
-#' This URL can be built with the *createWCS_URLs* funtion
-#' @param coverage Name of a coverage [character]
-#' @importFrom magrittr "%>%"
-#' @importFrom xml2 read_xml xml_find_all xml_children xml_text
-#' @importFrom stringr str_split
+#' @param coverage character; Name of a coverage
+#' @param url character; Web Coverage Service (WCS) Url. If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")
 #' @export
+coverage_get_coordsys <- function(coverage, url = NULL){
 
-coverage_get_coordsys <- function(desc_url = NULL, coverage){
-
-  if(is.null(desc_url)) desc_url<-createWCS_URLs(type="Meta")
-
-  desc_xml = xml2::read_xml(paste0(desc_url,coverage))
-
-  coord_sys = xml2::xml_find_all(desc_xml, ".//wcs:CoverageDescription") %>%
-    xml_children(.) %>% .[5] %>%
-    xml_children(.) %>%
-    xml_children(.) %>% .[2] %>%
-    xml_text() %>% str_split(., " ") %>%
-    unlist()
-
-  return(coord_sys)
+  md   <- getMetadata(coverage,url=url)
+  axes <- as.character(unique(md$Axis))
+  return(axes)
 
 }
 
 #' @title Get EPSG identifier
 #' @description Function to extract the EPSG identifier from a WCS WCPS coverage
-#' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character].
-#' This URL can be built with the *createWCS_URLs* funtion
-#' @param coverage Name of a coverage [character]
-#' @import xml2
-#' @importFrom magrittr "%>%"
-#' @importFrom stringr str_split
+#' @param coverage character; Name of a coverage
+#' @param url character; Web Coverage Service (WCS) Url. If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")
 #' @export
 
-coverage_get_coordinate_reference <- function(desc_url=NULL, coverage){
+coverage_get_coordinate_reference <- function(coverage, url=NULL){
 
-  if(is.null(desc_url)) desc_url<-createWCS_URLs(type="Meta")
-
-  d_xml <- xml2::read_xml(paste0(desc_url,coverage))
-
-  sys_Id <- xml_children(d_xml) %>%
-    xml_children(.) %>% xml_children(.) %>% .[1] %>%
-    xml_attr(., "srsName") %>%
-    str_split(., "=") %>% unlist
-
-  if(length(sys_Id) > 1){
-    sys_Id <- sys_Id  %>% .[2] %>%
-      str_split(.,"/") %>% unlist %>% .[8] %>%
-      str_split(.,"&") %>% unlist %>% .[1]
-  } else {
-    sys_Id <- sys_Id  %>% .[1] %>%
-      str_split(.,"/") %>% unlist %>% .[8] %>%
-      str_split(.,"&") %>% unlist %>% .[1]
-  }
-
-  return(sys_Id)
+  md   <- getMetadata(coverage,url=url)
+  epsg <- as.character(unique(md$EPSG))
+  return(epsg)
 
 }
 
 #' @title Get Temporal Extent
 #' @description Get the temporal extent from a WCS WCPS Coverage
-#' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character]
-#' This URL can be built with the *createWCS_URLs* funtion
-#' @param coverage Name of a coverage [character]
-#' @import xml2
-#' @importFrom magrittr "%>%"
-#' @importFrom stringr str_split str_replace_all
+#' @param coverage character; Name of a coverage
+#' @param url character; Web Coverage Service (WCS) Url. If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")
+#' @importFrom dplyr filter
+#' @importFrom stringr str_replace_all
 #' @export
 
-coverage_get_temporal_extent <- function(desc_url=NULL, coverage){
+coverage_get_temporal_extent <- function(coverage, url=NULL){
 
-  if(is.null(desc_url)) desc_url<-createWCS_URLs(type="Meta")
+  md      <- getMetadata(coverage,url=url)
 
-  t_xml = xml2::read_xml(paste0(desc_url,coverage))
+  if(!any(md$Type=="Time")) return(NA)
 
-  t_extent = xml2::xml_find_all(t_xml, ".//wcs:CoverageDescription") %>%
-    xml_children(.) %>% .[1] %>%
-    xml_children(.) %>% xml_children(.)
-
-  tmp_ext = c(str_split(xml_text(t_extent[1]), " ") %>% unlist() %>% .[3] %>% str_replace_all(., "\"", ""),
-              str_split(xml_text(t_extent[2]), " ") %>% unlist() %>% .[3] %>% str_replace_all(., "\"", "")
-  )
-
-  return(tmp_ext)
+  time    <- filter(md,Type=="Time")
+  stamps  <- c(as.character(time$Start),as.character(time$End))
+  stamps2 <- str_replace_all(stamps,'\"',"")
+  return(stamps2)
 
 }
 
 #' @title Get Bounding Box
 #' @description Get a bounding Box of a WCS, WCPS coverage
-#' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character]
-#' This URL can be built with the *createWCS_URLs* funtion
-#' @param coverage Name of a coverage [character]
-#' @import xml2
-#' @importFrom magrittr "%>%"
-#' @importFrom stringr str_split
+#' @param coverage character; Name of a coverage
+#' @param url character; Web Coverage Service (WCS) Url. If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")
+#' @importFrom dplyr filter
 #' @export
 
-coverage_get_bounding_box <- function(desc_url=NULL, coverage){
+coverage_get_bounding_box <- function(coverage, url=NULL){
 
-  if(is.null(desc_url)) desc_url<-createWCS_URLs(type="Meta")
-
-  s_xml = xml2::read_xml(paste0(desc_url,coverage))
-
-  s_extent = xml2::xml_find_all(s_xml, ".//wcs:CoverageDescription") %>%
-    xml_children(.) %>% .[1] %>%
-    xml_children(.) %>% xml_children(.)
-
-  s_extent_xmin = str_split(xml_text(s_extent[1]), " ") %>% unlist() %>% .[1]
-  s_extent_xmax = str_split(xml_text(s_extent[2]), " ") %>% unlist() %>% .[1]
-  s_extent_ymin = str_split(xml_text(s_extent[1]), " ") %>% unlist() %>% .[2]
-  s_extent_ymax = str_split(xml_text(s_extent[2]), " ") %>% unlist() %>% .[2]
-
-  BB <- c(s_extent_xmin, s_extent_xmax, s_extent_ymin, s_extent_ymax)
-
-  return(BB)
+  md      <- getMetadata(coverage,url=url)
+  ext     <- filter(md,Type=="X" | Type=="Y")
+  stamps  <- c(as.character(ext$Start),as.character(ext$End))
+  stamps2 <- stamps[c(1,3,2,4)]
+  return(stamps2)
 
 }
 
 #' @title Get Timestamps
-#' @description Get the available timestamps of WCS, WCPS coverage
-#' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character]
-#' This URL can be built with the *createWCS_URLs* funtion
-#' @param coverage Name of a coverage [character]
-#' @import xml2
-#' @importFrom magrittr "%>%"
-#' @importFrom stringr str_split
+#' @description Get the available timestamps of WCS coverages
+#' @param coverage character; Name of a coverage
+#' @param url character; Web Coverage Service (WCS) Url. If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")
+#' @param timetype boolean; return the type of storage of time dimension in coverage (regular, irregular, none)?
+#' @param verbose boolean; Want to return the processed coverage?
+#' @importFrom dplyr filter
+#' @importFrom stringr str_split str_replace_all
+#' @importFrom lubridate as_datetime
 #' @export
 
-coverage_get_timestamps <- function(desc_url=NULL, coverage){
+coverage_get_timestamps <- function(coverage, url=NULL, timetype=FALSE, verbose=FALSE){
 
-  if(is.null(desc_url)) desc_url<-createWCS_URLs(type="Meta")
+  md   <- parseMetadata(coverage,url=url)
+  iscoeff<-filter(md,L3=="coefficients" | L4=="coefficients" | L5=="coefficients" | L6=="coefficients")
 
-  i_xml <- read_xml(paste0(desc_url,coverage))
+  if(nrow(iscoeff)>1) stop("Multiple possible TimeStamps available. Operation stopped")
+  if(nrow(iscoeff)==1) {
 
-  av_img_times <- xml_find_all(i_xml, ".//wcs:CoverageDescription") %>%
-    xml2::xml_children(.) %>% .[5] %>%
-    xml_children(.) %>% xml_children(.) %>% .[6] %>%
-    xml_children(.) %>% xml_children(.) %>% .[2] %>%
-    xml_text(.) %>% str_replace_all(., "\"", "") %>%
-    str_split(.," ") %>% unlist()
+    vals <-iscoeff[["Value"]]
+    replacer<-str_replace_all(vals,'\"',"")
+    splitter<-strsplit(replacer," ")[[1]]
+    timetype <- "Irregular Time Dimension"
 
-  return(av_img_times)
+  }
+
+  if(nrow(iscoeff)==0) {
+
+    md1<-getMetadata(coverage)
+    time<-filter(md1,Type=="Time")
+
+    if(nrow(time)==0) {
+      splitter <- NA
+      timetype <- "No Time Dimension"
+    } else {
+
+      stamps  <- c(as.character(time$Start),as.character(time$End))
+      stamps2 <- str_replace_all(stamps,'\"',"")
+
+      diff<-as.numeric(as.character(time$Resolution))
+
+      dates    <- seq(as_datetime(stamps[1]),as_datetime(stamps[2]),by=diff)
+      splitter <- paste0(str_replace_all(as.character(dates)," ","T"),".000Z")
+      timetype <- "Regular Time Dimension"
+
+    }
+  }
+
+  if(isTRUE(verbose)) print(coverage)
+  if(!isTRUE(timetype)) {return(splitter)} else {return(timetype)}
 
 }
 
 #' @title Get Bands
 #' @description Get the available bands of one WCS, WCPS coverage
-#' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character]
-#' This URL can be built with the *createWCS_URLs* funtion
-#' @param coverage Name of a coverage [character]
-#' @import xml2
-#' @importFrom magrittr "%>%"
+#' @param coverage character; Name of a coverage
+#' @param url character; Web Coverage Service (WCS) Url. If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")
+#' @importFrom dplyr filter
 #' @export
 
-coverage_get_bands <- function(desc_url=NULL, coverage){
+coverage_get_bands <- function(coverage, url=NULL){
 
-  if(is.null(desc_url)) desc_url<-createWCS_URLs(type="Meta")
-
-  b_xml<- read_xml(paste0(desc_url,coverage))
-
-  bands<- xml_find_all(b_xml, ".//wcs:CoverageDescription") %>%
-    xml_children(.) %>% .[6] %>%
-    xml_children() %>%
-    xml_find_all(.,"./swe:field") %>% xml_attr(.,"name")
-
+  getMeta <- parseMetadata(coverage,url=url)
+  bands<- dplyr::filter(getMeta,L2=="rangeType" & Attributes==".name")[["Value"]]
   return(bands)
 
 }
 
 #' @title Get Resolution
 #' @description Get the resolution of one WCS, WCPS coverage
-#' @param desc_url Web Coverage Service (WCS) DescribeCoverage url [character]
-#' This URL can be built with the *createWCS_URLs* funtion
-#' @param coverage Name of a coverage [character]
-#' @import xml2
-#' @importFrom magrittr "%>%"
-#' @importFrom stringr str_split
+#' @param coverage character; Name of a coverage
+#' @param url character; Web Coverage Service (WCS) Url. If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")
+#' @importFrom dplyr filter
 #' @export
+coverage_get_resolution <- function(coverage, url=NULL){
 
-coverage_get_resolution <- function(desc_url=NULL, coverage){
-
-  if(is.null(desc_url)) desc_url<-createWCS_URLs(type="Meta")
-
-  r_xml = xml2::read_xml(paste0(desc_url,coverage))
-
-  resolution = xml2::xml_find_all(r_xml, ".//wcs:CoverageDescription") %>%
-    xml_children(.) %>% .[5] %>%
-    xml_children() %>%  xml_children() %>% .[4] %>%
-    xml_children() %>%  xml_children() %>% .[1] %>%
-    xml_text() %>% str_split(.," ") %>% unlist() %>% .[1] %>%
-    as.numeric() %>% abs()
-
-  return(resolution)
+  md      <- getMetadata(coverage,url=url)
+  ext     <- filter(md,Type=="X" | Type=="Y")
+  stamps  <- as.character(ext$Resolution)
+  return(stamps)
 
 }
+
+#' @title Parse the whole Rasdaman Environment
+#' @description Scrape the data in the whole Rasdaman Environment
+#' @param url character; Web Coverage Service (WCS) Url. If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")
+#' @export
+parseCoverages <- function(url=NULL){
+
+  caps<-getCapability(url=url)
+  lp<-lapply(caps,function(c){
+
+    csys <- paste(coverage_get_coordsys(c,url=url),collapse=" /--/ ")
+    cref <- paste(coverage_get_coordinate_reference(c,url=url),collapse=" /--/ ")
+    ctex <- paste(coverage_get_temporal_extent(c,url=url),collapse=" /--/ ")
+    ctmp <- coverage_get_timestamps(c,url=url)
+    cbbx <- paste(coverage_get_bounding_box(c,url=url),collapse=" /--/ ")
+    cbnd <- paste(coverage_get_bands(c,url=url),collapse=" /--/ ")
+    cres <- paste(coverage_get_resolution(c,url=url),collapse=" /--/ ")
+
+    cb <- cbind(c,csys,cref,ctex,ctmp,cbbx,cbnd,cres)
+    colnames(cb)<-c("Coverage",
+                    "Coordinate System",
+                    "Coordinate Reference",
+                    "Temporal Extent",
+                    "Time Stamps",
+                    "BoundingBox",
+                    "Bands",
+                    "Resolution")
+    return(cb)
+
+  })
+  rb<-do.call(rbind,lp)
+  return(rb)
+}
+
+
+

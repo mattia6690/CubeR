@@ -5,27 +5,25 @@
 \title{Calculate Pixel Buffer History}
 \usage{
 geocoded_pixel_buffer(coverage, coords, band, buffer, date = NULL,
-  filename = "request", query_url = NULL, plot = F)
+  filename = "request", url = NULL, plot = F)
 }
 \arguments{
-\item{coverage}{name of the coverage [character]}
+\item{coverage}{character; name of the coverage}
 
-\item{coords}{coordinates of the location of interest [character]}
+\item{coords}{character; coordinates of the location of interest}
 
-\item{band}{coverage band [character]}
+\item{band}{character; coverage band}
 
-\item{buffer}{A buffer Zone around the coordinates of the Point [numeric]}
+\item{buffer}{numeric; A buffer Zone around the coordinates of the Poi}
 
-\item{date}{date range in format (Ymd) [character]}
+\item{date}{character; date range in format (Ymd)}
 
-\item{filename}{filename for the NETCDF Output.
-If none is provided the Object will be deleted after temporal storage in the tempdir [character]}
+\item{filename}{character; filename for the NETCDF Output. If none is provided the Object will be deleted after temporal storage in the tempdir}
 
-\item{query_url}{Web Coverage Service (WCS) for processing the query [character].
-This URL can be built with the *createWCS_URLs* function}
+\item{url}{character; Web Coverage Service (WCS) Url. If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")}
 
-\item{plot}{do you want a generic plot to be returned [boolean]}
+\item{plot}{boolean; do you want a generic plot to be returned?}
 }
 \description{
-Calculate pixel buffer history of a coverage band
+Calculate pixel buffer history of a coverage band. This functionality is limited to Netcdf files
 }

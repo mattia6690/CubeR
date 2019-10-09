@@ -5,7 +5,7 @@
 \title{Get a raster from coverage}
 \usage{
 image_from_coverage(coverage, slice_E, slice_N, date, res_eff = 1,
-  format = "TIFF", bands = NULL, filename = NULL, query_url = NULL)
+  format = "image/tiff", bands = NULL, filename = NULL, url = NULL)
 }
 \arguments{
 \item{coverage}{name of the coverage [character]}
@@ -20,12 +20,13 @@ image_from_coverage(coverage, slice_E, slice_N, date, res_eff = 1,
 
 \item{format}{image format in WCPS query [character]}
 
-\item{bands}{coverage bands to calculate raster. Can contain one or more bands from the same coverage [character]}
+\item{bands}{character; coverage bands to calculate raster. Can contain one or more bands from the same coverage.
+If NULL all bands are used}
 
 \item{filename}{If the raster image should be saved please digit a path and a filename. [character]}
 
-\item{query_url}{Web Coverage Service (WCS) for processing the query.
-This URL can be built with the *createWCS_URLs* function. [character]}
+\item{url}{Web Coverage Service (WCS) DescribeCoverage url [character].
+If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")}
 }
 \description{
 This function provides the possibility to interact directly with the data cubes. It gives the option to write the images to

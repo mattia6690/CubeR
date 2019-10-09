@@ -5,26 +5,22 @@
 \title{Calculate Normalized Difference Pixel History}
 \usage{
 norm_diff_pixel(coverage, coords, band1, band2, date = NULL,
-  desc_url = NULL, query_url = NULL, plot = TRUE)
+  url = NULL, format = "text/csv")
 }
 \arguments{
-\item{coverage}{name of the coverage [character]}
+\item{coverage}{character; name of the coverage}
 
-\item{coords}{coordinates of the location of interest [character]}
+\item{coords}{character; coordinates of the location of interest}
 
-\item{band1}{coverage band [character]}
+\item{band1}{character; coverage band}
 
-\item{band2}{coverage band [character]}
+\item{band2}{character; coverage band}
 
-\item{date}{date range in format (Ymd) [character]}
+\item{date}{character; date range in format (Ymd)}
 
-\item{desc_url}{Web Coverage Service (WCS) DescribeCoverage url [character].
-This URL can be built with the *createWCS_URLs* function}
+\item{url}{character; Web Coverage Service (WCS) Url. If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")}
 
-\item{query_url}{Web Coverage Service (WCS) for processing the query [character].
-This URL can be built with the *createWCS_URLs* function}
-
-\item{plot}{handler if a plot is returned or a vector containing timestamp and value}
+\item{format}{character; Output format. Not all available are implemented for each datacube. Please see `getFormat` for all the available formats}
 }
 \description{
 Calculate normalized difference pixel history between band1 and band2
