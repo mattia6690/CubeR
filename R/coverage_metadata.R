@@ -369,7 +369,7 @@ coverage_get_resolution <- function(coverage, url=NULL){
 #' @export
 parseCoverages <- function(url=NULL){
 
-  caps<-getCapability(url=url)
+  caps<-getCapabilities(url=url)
   lp<-lapply(caps,function(c){
 
     csys <- paste(coverage_get_coordsys(c,url=url),collapse=" /--/ ")
