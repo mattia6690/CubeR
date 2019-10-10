@@ -16,7 +16,7 @@ norm_diff_pixel(coverage, coords, band1, band2, date = NULL,
 
 \item{band2}{character; coverage band}
 
-\item{date}{character; date range in format (Ymd)}
+\item{date}{character(s); date with one or date range range with two dates. If NULL all the available time range is returned.}
 
 \item{url}{character; Web Coverage Service (WCS) Url. If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")}
 

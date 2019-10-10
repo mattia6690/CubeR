@@ -27,6 +27,7 @@ createWCS_URLs<-function(type, url = NULL){
 #' @importFrom XML xmlParse xmlToList
 #' @importFrom dplyr filter
 #' @importFrom tibble enframe
+#' @importFrom stringr str_replace_all
 #' @export
 getProvider <- function(url=NULL){
 
@@ -35,20 +36,20 @@ getProvider <- function(url=NULL){
   xml_cov1 <- xmlParse(urlp)
   xml_cov2 <- enframe(unlist(xmlToList(xml_cov1)))
   xml_cov3 <- filter(xml_cov2,grepl(str,name))
-  xml_cov3$name<-str_replace(xml_cov3$name,str,"")
+  xml_cov3$name <- str_replace(xml_cov3$name,str,"")
 
   return(xml_cov3)
 
 }
 
-#' @title Returns the Capabilities
+#' @title Returns the Coverages
 #' @description This function Returns the Capabilities of a DataCube containing all coverages available
 #' @param url character; Web Coverage Service (WCS) Url. If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")
 #' @importFrom XML xmlParse xmlToList
 #' @importFrom dplyr filter
 #' @importFrom tibble enframe
 #' @export
-getCapabilities <-function(url=NULL){
+getCoverages <-function(url=NULL){
 
   urlp     <- createWCS_URLs(type="Capability",url=url)
   xml_cov1 <- xmlParse(urlp)
@@ -58,6 +59,25 @@ getCapabilities <-function(url=NULL){
   return(xml_cov3)
 
 }
+
+#' @title Find Capabilities
+#' @description This function searches for available Coverages within the
+#' @param str character; string to search for among coverages
+#' @param url character; Web Coverage Service (WCS) Url. If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")
+#' @export
+findCoverages <-function(str,url=url){
+
+  capas<-getCoverages()
+
+  gr <- grep("NDVI",capas,value = T)
+  ind<- grep("NDVI",capas)
+
+  bind<-cbind(gr,ind)
+  colnames(bind)<-c("Coverage","ID")
+  return(bind)
+
+}
+
 
 
 #' @title Rasdaman support formats
@@ -89,10 +109,10 @@ setMetaCols<-function(addcols=NULL,keepsao=F){
 
   if(is.null(addcols)){
 
-    saoTcols<- cbind("Time",c("DATE","Time","ansi","date"))
+    saoTcols<- cbind("Time",c("DATE","Date","Time","TIME","time","ansi","date"))
     saoXcols<- cbind("X",c("X","Lon","Long","E"))
     saoYcols<- cbind("Y",c("Y","Lat","N"))
-    bind<-rbind.data.frame(saoTcols,saoXcols,saoYcols)
+    bind<-rbind(saoTcols,saoXcols,saoYcols)
     colnames(bind)<-c("Type","Axis")
 
   }
@@ -206,7 +226,7 @@ getMetadata <- function(coverage, Metacols=NULL, url=NULL){
   offset3<-unlist(offset2)
 
   # Bind all of that
-  bind<-cbind.data.frame(coverage,labels,lc,uc,offset3,units1,epsg2)
+  bind<-cbind(coverage,labels,lc,uc,offset3,units1,epsg2)
   colnames(bind)<- c("Coverage","Axis","Start","End","Resolution","Units","EPSG")
   bind<-as_tibble(bind)
   bind2<-suppressWarnings(dplyr::left_join(bind,Metacols,by="Axis"))
@@ -367,7 +387,7 @@ coverage_get_resolution <- function(coverage, url=NULL){
 #' @description Scrape the data in the whole Rasdaman Environment
 #' @param url character; Web Coverage Service (WCS) Url. If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")
 #' @export
-parseCoverages <- function(url=NULL){
+parseEnvironment <- function(url=NULL){
 
   caps<-getCapabilities(url=url)
   lp<-lapply(caps,function(c){

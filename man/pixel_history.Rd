@@ -4,23 +4,21 @@
 \alias{pixel_history}
 \title{Pixel History}
 \usage{
-pixel_history(coverage, coord_sys, bands, coords, date = NULL,
-  url = NULL, plot = F)
+pixel_history(coverage, coords = NULL, bands = NULL, date = NULL,
+  url = NULL, encoding = "UTF-8")
 }
 \arguments{
 \item{coverage}{character; name of the coverage}
 
-\item{coord_sys}{character; coordinate system}
+\item{coords}{character; coordinates of the location of interest in the native coverage projection. If NULL the middle coordinate will be taken}
 
 \item{bands}{character; coverage bands to calculate and visualize pixel history}
-
-\item{coords}{character; coordinates of the location of interest in c(Lat,Lon)}
 
 \item{date}{character; date range in format (Ymd)}
 
 \item{url}{character; Web Coverage Service (WCS) Url. If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")}
 
-\item{plot}{boolean; Should the data be plotted}
+\item{encoding}{character; Encoding for the response. "UTF-8" as standard}
 }
 \description{
 Returns a pixel history of one or multiple bands from one coverage.

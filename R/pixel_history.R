@@ -1,100 +1,101 @@
 #' @title Pixel History
 #' @description Returns a pixel history of one or multiple bands from one coverage.
 #' @param coverage character; name of the coverage
-#' @param coord_sys character; coordinate system
+#' @param coords character; coordinates of the location of interest in the native coverage projection. If NULL the middle coordinate will be taken
 #' @param bands character; coverage bands to calculate and visualize pixel history
-#' @param coords character; coordinates of the location of interest in c(Lat,Lon)
 #' @param date character; date range in format (Ymd)
 #' @param url character; Web Coverage Service (WCS) Url. If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")
-#' @param plot boolean; Should the data be plotted
+#' @param encoding character; Encoding for the response. "UTF-8" as standard
 #' @importFrom httr GET content
-#' @importFrom magrittr "%>%"
-#' @importFrom stringr str_replace_all str_split
 #' @importFrom urltools url_encode
-#' @importFrom grDevices rainbow
+#' @importFrom dplyr filter left_join bind_cols
+#' @importFrom tibble as_tibble
 #' @export
 
-pixel_history <- function(coverage, coord_sys, bands, coords, date = NULL,
-                          url=NULL,plot=F){
+pixel_history <- function(coverage, coords=NULL, bands=NULL, date = NULL,
+                          url=NULL,encoding="UTF-8"){
 
+  # Options
+  options(scipen=100)
 
+  # Build URL
   desc_url<-createWCS_URLs(type="Meta",url=url)
   query_url<-createWCS_URLs(type="Query",url=url)
 
-  times<-coverage_get_timestamps(desc_url,coverage)
+  # Use buildin functions
+  coord_sys   <- coverage_get_coordsys(coverage,url=url)
+  bands.avail <- coverage_get_bands(coverage,url=url)
 
-  if(is.null(date)){
+  if(is.null(bands)) bands <- bands.avail
+  if(is.null(date))  date  <- coverage_get_temporal_extent(coverage,url=url)
+  NoTemp<- all(is.na(date))
+  if(is.null(coords)) {
 
-    times <- as.Date(times)
+    cbb   <- as.numeric(coverage_get_bounding_box(coverage,url=url))
+    cbb1  <- mean(c(cbb[1],cbb[2]))
+    cbb2  <- mean(c(cbb[3],cbb[4]))
+    coords<- as.character(c(cbb1,cbb2))
 
-    start_date_mod <- times[1]
-    end_date_mod <- times[length(times)]
+  }
+
+
+  # X/Y/Date Queries
+  c1 <- bind_cols(Type=c("X","Y"),coords=coords)
+  lj <- left_join(getMetadata(coverage,url=url),c1,by="Type")
+
+  x <-  filter(lj,Type=="X")
+  query.x <- paste0(x$Axis,'(',x$coords,')')
+  y <-  filter(lj,Type=="Y")
+  query.y <- paste0(',',y$Axis,'(',y$coords,')')
+
+
+  if(!isTRUE(NoTemp)) {
+    d <- filter(lj,Type=="Time")
+    dateS   <- as.Date(date)
+    query.d <- paste0(',',d$Axis,'("',dateS[1],'":"', dateS[2],'")')
+
+    timestamps  <- as.Date(coverage_get_timestamps(coverage))
+    timestampsW <- timestamps>=dateS[1] & timestamps<=dateS[2]
+    timestamps2 <- as.character(timestamps[timestampsW])
 
   } else {
 
-    start_date_mod = date[1]
-    end_date_mod = date[2]
-
-    times <- times[times >= start_date_mod & times <= end_date_mod] %>% as.Date
-
-  }
-
-  bands_len <- length(bands)
-
-  if(bands_len == 0) stop("No Bands Found")
-
-  responses = list()
-  max_res = list()
-
-  for(k in 1:bands_len){
-
-    query <-str_c('for c in ( ',coverage,' ) return encode( c.',bands[k],
-                  '[',
-                  coord_sys[1],'(',coords[1],'),',
-                  coord_sys[2],'(',coords[2],'),',
-                  coord_sys[3], '("',
-                  start_date_mod,'":"', end_date_mod,'")],"csv")')
-
-    query_encode  <- urltools::url_encode(query)
-    request       <- paste(query_url, query_encode, collapse = NULL, sep="")
-
-    r             <- GET(request)
-    res           <- content(r, "text")
-
-    num <- str_replace_all(res,"\\{","") %>%
-      str_replace_all(.,"\\}","") %>%
-      str_replace_all(.,"\"","") %>%
-      str_split(.,",") %>% unlist() %>%
-      str_split(.," ") %>% unlist() %>%
-      as.numeric()
-
-    responses[[k]] = num
-    max_res[[k]] = max(num)
-
-  }
-
-  resp<-do.call(cbind.data.frame,responses)
-  resp<-cbind.data.frame(times,resp)
-  names(resp)<-c("Date",bands)
-
-
-  if(plot==T){
-    abs_max <- responses %>% unlist %>% as.numeric %>% max
-
-    p <- plot(times,responses[[1]], type="o", col = rainbow(1)[1], lwd = 2, xlab="Date", ylab="Single channels", ylim = c(0,abs_max),
-              cex.axis = 1.2, cex.lab = 1.2)
-
-    if(length(responses) == 1){
-
-      p<-legend("topright", inset = .02,legend=c(bands), col = c(rainbow(length(responses))), pch=15)
-
-    } else{
-
-      for(l in 2:length(responses)) p <- lines(times, responses[[l]], type = "o", col = rainbow(l)[l], lwd = 2)
-      p<-legend("topright", inset = .02,legend=c(bands), col = c(rainbow(length(responses))), pch=15)
+    query.d<-NULL
+    timestamps2<-NA
 
     }
 
-  } else return(resp)
+  # Band Queries
+
+  if(length(bands.avail)>1){query.b<-paste0("c.",bands)} else {query.b<-"c"}
+
+  # Bind queries
+  queries<- paste0('for c in ( ',coverage,' ) return encode( ',query.b,
+                   '[',query.x,query.y,query.d,'],"text/csv")')
+
+
+  l1<-lapply(c(1:length(queries)),function(x){
+
+    query_encode  <- urltools::url_encode(queries[x])
+    request       <- paste(query_url, query_encode, collapse = NULL, sep="")
+
+    return   <- GET(request)
+    return2  <- content(r, "text",encoding = encoding)
+
+    if(grepl("Exception",return)) {
+      num<- "Exception occurred : Check Input"
+    } else {
+      num <- strsplit(res,",")[[1]]
+    }
+
+    bind<-cbind(coverage,timestamps2[x],bands[x],num)
+    return(bind)
+
+  })
+
+  return<-as_tibble(do.call(rbind,l1))
+  return<-setNames(return,c("Coverage","TimeStamp","Band","Value"))
+  return<-arrange(return, Coverage, TimeStamp,Band)
+  return(return)
 
 }
