@@ -23,18 +23,19 @@ image_from_coverage <- function(coverage, slice_E, slice_N, date,
                                 res_eff=1, format="image/tiff", bands=NULL,filename=NULL,
                                 url=NULL){
 
-
-
-
+  # Build URL
   if(is.null(query_url)) query_url<-createWCS_URLs(url=url,type="Query")
 
-  ref_Id<-coverage_get_coordinate_reference(coverage=coverage)
-  coord_sys<-coverage_get_coordsys(coverage=coverage)
-
+  # Use buildin functions
+  ref_Id<-coverage_get_coordinate_reference(coverage=coverage,url=url)
+  coord_sys<-coverage_get_coordsys(coverage=coverage,url=url)
   gbands<-coverage_get_bands(coverage)
+
+  # Exception handlimg
   if(is.null(bands)) bands<- gbands
   if(any(!is.element(gbands,bands))) stop("One or more bands you selected are not present in the selected coverage")
 
+  # Query builder
   bands_len <- length(bands)
   rasters <- list()
 
@@ -50,6 +51,7 @@ image_from_coverage <- function(coverage, slice_E, slice_N, date,
     query_encode  <- urltools::url_encode(query)
     request       <- paste(query_url, query_encode, collapse = NULL, sep="")
 
+    # Return handling
     res     <- GET(request)
     bin     <- content(res, "raw")
 
@@ -57,11 +59,13 @@ image_from_coverage <- function(coverage, slice_E, slice_N, date,
     to_img  <- get(paste0("read",toupper(format2)))
     img     <- tryCatch({to_img(bin)},error=function(e){message("This format cannot be read by the function")})
 
+    # Build raster
     ras_ext <- extent(c(as.numeric(slice_E), as.numeric(slice_N)))
     ras     <- raster(img)
     proj4string(ras) <- paste0("+init=epsg:",ref_Id)
     extent(ras)      <- ras_ext
 
+    # Resample rasters if necessary
     if(res_eff == 1){
 
       rasters[[i]] <- ras
