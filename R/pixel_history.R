@@ -19,7 +19,6 @@ pixel_history <- function(coverage, coords=NULL, bands=NULL, date = NULL,
   options(scipen=100)
 
   # Build URL
-  desc_url<-createWCS_URLs(type="Meta",url=url)
   query_url<-createWCS_URLs(type="Query",url=url)
 
   # Use buildin functions
@@ -54,7 +53,7 @@ pixel_history <- function(coverage, coords=NULL, bands=NULL, date = NULL,
     dateS   <- as.Date(date)
     query.d <- paste0(',',d$Axis,'("',dateS[1],'":"', dateS[2],'")')
 
-    timestamps  <- as.Date(coverage_get_timestamps(coverage))
+    timestamps  <- as.Date(coverage_get_timestamps(coverage,url=url))
     timestampsW <- timestamps>=dateS[1] & timestamps<=dateS[2]
     timestamps2 <- as.character(timestamps[timestampsW])
 
@@ -76,24 +75,25 @@ pixel_history <- function(coverage, coords=NULL, bands=NULL, date = NULL,
 
   l1<-lapply(c(1:length(queries)),function(x){
 
-    query_encode  <- urltools::url_encode(queries[x])
-    request       <- paste(query_url, query_encode, collapse = NULL, sep="")
+    encode  <- urltools::url_encode(queries[x])
+    request <- paste(query_url, encode, collapse = NULL, sep="")
 
-    return   <- GET(request)
-    return2  <- content(r, "text",encoding = encoding)
+    get   <- GET(request)
+    con   <- content(get, "text",encoding = encoding)
 
-    if(grepl("Exception",return)) {
+    if(grepl("Exception",con)) {
       num<- "Exception occurred : Check Input"
     } else {
-      num <- strsplit(res,",")[[1]]
+      num <- strsplit(con,",")[[1]]
     }
 
-    bind<-cbind(coverage,timestamps2[x],bands[x],num)
+    bind<-cbind(coverage,timestamps2,bands[x],num)
     return(bind)
 
   })
 
-  return<-as_tibble(do.call(rbind,l1))
+  return<-do.call(rbind,l1)
+  return<-as_tibble(return)
   return<-setNames(return,c("Coverage","TimeStamp","Band","Value"))
   return<-arrange(return, Coverage, TimeStamp,Band)
   return(return)
