@@ -287,13 +287,14 @@ coverage_get_temporal_extent <- function(coverage, url=NULL){
 #' @description Get a bounding Box of a WCS, WCPS coverage
 #' @param coverage character; Name of a coverage
 #' @param url character; Web Coverage Service (WCS) Url. If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")
-#' @importFrom dplyr filter
+#' @importFrom dplyr filter arrange
 #' @export
 
 coverage_get_bounding_box <- function(coverage, url=NULL){
 
   md      <- getMetadata(coverage,url=url)
   ext     <- filter(md,Type=="X" | Type=="Y")
+  ext     <- arrange(ext,Type)
   stamps  <- c(as.character(ext$Start),as.character(ext$End))
   stamps2 <- stamps[c(1,3,2,4)]
   return(stamps2)

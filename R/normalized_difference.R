@@ -4,7 +4,7 @@
 #' @param coords character; coordinates of the location of interest
 #' @param band1 character; coverage band
 #' @param band2 character; coverage band
-#' @param date character; date range in format (Ymd)
+#' @param date character(s); date with one or date range range with two dates. If NULL all the available time range is returned.
 #' @param url character; Web Coverage Service (WCS) Url. If NULL then it is directing to the SAO homepage ("http://saocompute.eurac.edu/rasdaman/ows")
 #' @param format character; Output format. Not all available are implemented for each datacube. Please see `getFormat` for all the available formats
 #' @importFrom httr GET content
@@ -17,21 +17,24 @@
 norm_diff_pixel <- function(coverage, coords, band1, band2, date = NULL,
                            url=NULL,format="text/csv"){
 
+  # Build queries
   desc_url <-createWCS_URLs(type="Meta",url=url)
   query_url<-createWCS_URLs(type="Query",url=url)
 
-  coord_sys<-coverage_get_coordsys(coverage=coverage)
-
+  # Catch Exceptions
   if(is.null(band1) | is.null(band2)) stop("Can't calculate normalized difference for selected coverage, reason: No band selected!")
 
-  times<-coverage_get_timestamps(desc_url,coverage)
+  # Use buildin functions
+  coord_sys <- coverage_get_coordsys(coverage=coverage,url=url)
+  times     <- coverage_get_temporal_extent(coverage,url=url)
 
+  # Do the querying
   csys1<-paste0(coord_sys[1],'(',round(coords[1]),')')
   csys2<-paste0(coord_sys[2],'(',round(coords[2]),')')
 
-  if(is.null(date))   date2<-c(min(times),max(times))
+  if(is.null(date))   date2<-c(times[1],times[2])
   if(length(date)==1) date2<-rep(date,2)
-  if(length(date)>1)  date2<-c(min(date),max(date))
+  if(length(date)>1)  date2<-c(date[1],date[2])
 
   csys3 <-paste0(coord_sys[3],'("',date2[1],'":"', date2[2],'")',sep="")
   paster<-paste(csys1,csys2,csys3,sep=",")
@@ -50,6 +53,8 @@ norm_diff_pixel <- function(coverage, coords, band1, band2, date = NULL,
   query_encode  <- urltools::url_encode(query)
   request       <- paste(query_url, query_encode, collapse = NULL, sep="")
 
+
+  # Return the response
   res <- GET(request)
   bin <- suppressMessages(
     content(res,"text") %>%
@@ -84,13 +89,17 @@ norm_diff_pixel <- function(coverage, coords, band1, band2, date = NULL,
 norm_diff_raster <- function(coverage, slice_E, slice_N, date, band1, band2,
                              res_eff=1,format="image/tiff", url = NULL){
 
+  # Build urls
   query_url<-createWCS_URLs(type="Query",url=url)
 
+  # Catch Exceptions
   if(length(date)>1) stop("No multiple dates supported")
 
-  coord_sys <-coverage_get_coordsys(coverage=coverage)
-  ref_Id    <-coverage_get_coordinate_reference(coverage=coverage)
+  # Use build-in functions
+  coord_sys <-coverage_get_coordsys(coverage=coverage,url = url)
+  ref_Id    <-coverage_get_coordinate_reference(coverage=coverage,url = url)
 
+  # Build request
   query<- paste0('for c in (', coverage, ') ', 'return encode ((unsigned char)(127.5*(1+( (int) ',
                  'c.',band1,'[',
                  coord_sys[1],'(',slice_E[1], ':',slice_E[2], '),',
@@ -117,6 +126,7 @@ norm_diff_raster <- function(coverage, slice_E, slice_N, date, band1, band2,
   query_encode  <- urltools::url_encode(query)
   request       <- paste(query_url, query_encode, collapse = NULL, sep="")
 
+  # Handle request
   res <- GET(request)
   bin <- content(res, "raw")
 
@@ -129,6 +139,7 @@ norm_diff_raster <- function(coverage, slice_E, slice_N, date, band1, band2,
   proj4string(ras) <- paste0("+init=epsg:",ref_Id)
   extent(ras) <- ras_ext
 
+  # Optional resampling
   if(res_eff == 1){
 
     return(ras)
